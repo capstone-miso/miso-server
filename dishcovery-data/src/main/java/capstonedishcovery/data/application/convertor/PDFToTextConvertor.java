@@ -13,15 +13,13 @@ import java.io.IOException;
  **/
 
 public class PDFToTextConvertor {
-    public static void main(String[] args) {
-        try {
-            String src = "D:\\downloads\\업무추진비 집행내역 작성서식(2023년 2월).pdf";
-            PDDocument document = PDDocument.load(new File(src));
-            PDFTextStripper stripper = new PDFTextStripper();
-            String text = stripper.getText(document);
-            System.out.println(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void convertPDFToText(String fileName) throws IOException {
+        String path = "D:\\downloads\\";
+        String testFileName = "업무추진비 집행내역 작성서식(2023년 2월).pdf";
+        String src = path + testFileName;
+        PDDocument document = PDDocument.load(new File(src));
+        PDFTextStripper stripper = new PDFTextStripper();
+        String text = stripper.getText(document);
+        System.out.println(text);
     }
 }

@@ -1,12 +1,16 @@
 package capstonedishcovery.data.application.download;
 
+import capstonedishcovery.data.application.convertor.PDFToTextConvertor;
+import capstonedishcovery.data.application.files.service.FileListService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -14,10 +18,22 @@ import java.util.UUID;
  * date          : 2023-03-20
  * description   :
  **/
-public class DownloadFileController {
-    public static void main(String[] args) {
-        String fileUrl = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=200179&atchFileId=3348a0b16be7a8571d0c268c27c6ea3865da0265250a1a043c15ad8488ea19aa&fileSn=1";
+@Component
+@RequiredArgsConstructor
+@Log4j2
+public class DownloadFileComponent {
+    private static final int BUFFER_SIZE = 4096;
+    private final FileListService fileListService;
+
+    public void saveFile() {
+//        https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea38595959354d4af99528e3ee01bcc640d2&fileSn=1
+//        https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea3806cffad79ee16d5feb1a66debb1217fe&fileSn=1
+//        https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea38820f522fcfc0b8daca556e708f1d1479&fileSn=1
+//        https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea38820f522fcfc0b8daca556e708f1d1479&fileSn=2
+
+        String source = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do";
         try {
+            String fileUrl = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea38bd0ac87c58096974266b15946c5361aa&fileSn=1";
             // 외부 URL에 요청하기
             URL url = new URL(fileUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -55,7 +71,6 @@ public class DownloadFileController {
                 String outputDir = "D:/downloads";
                 FileOutputStream fos = new FileOutputStream(new File(outputDir, fileName));
 
-                final int BUFFER_SIZE = 4096;
                 int bytesRead;
                 byte[] buffer = new byte[BUFFER_SIZE];
                 while ((bytesRead = is.read(buffer)) != -1) {
@@ -63,13 +78,21 @@ public class DownloadFileController {
                 }
                 fos.close();
                 is.close();
-                System.out.println("FILE DOWNLOADED");
+
+                Long fileId = fileListService.saveDownloadedFileInfo(fileName, fileUrl).getFid();
+                log.info(String.format("FILE DOWNLOADED: %s", fileName));
+                try {
+                    PDFToTextConvertor.convertPDFToText(fileName);
+                    fileListService.changeFileConvertedStatus(fileId);
+                    log.info("FILE CONVERTED SUCCESS");
+                } catch (IOException e) {
+                    log.info("FILE CONVERT FAILED");
+                    throw new RuntimeException(e);
+                }
             }
             conn.disconnect();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         } catch (IOException e) {
+            log.error("FILE DOWNLOAD FAILED");
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -77,11 +100,11 @@ public class DownloadFileController {
 
     private static void fileEncodingCheck(String disposition) {
         String[] charSet = {"utf-8", "euc-kr", "ksc5601", "iso-8859-1", "x-windows-949"};
-        for(int i = 0; i<charSet.length; i++){
-            for(int j = 0; j<charSet.length; j++){
-                try{
+        for (int i = 0; i < charSet.length; i++) {
+            for (int j = 0; j < charSet.length; j++) {
+                try {
                     System.out.println("[" + charSet[i] + "," + charSet[j] + "]" + new String(disposition.getBytes(charSet[i]), charSet[j]));
-                } catch (UnsupportedEncodingException e){
+                } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
             }
