@@ -33,7 +33,7 @@ public class DownloadFileComponent {
 
         String source = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do";
         try {
-            String fileUrl = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea38bd0ac87c58096974266b15946c5361aa&fileSn=1";
+            String fileUrl = "https://www.gwangjin.go.kr/portal/cmmn/file/fileDown.do?menuNo=201646&atchFileId=3348a0b16be7a8571d0c268c27c6ea3806cffad79ee16d5feb1a66debb1217fe&fileSn=1";
             // 외부 URL에 요청하기
             URL url = new URL(fileUrl);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

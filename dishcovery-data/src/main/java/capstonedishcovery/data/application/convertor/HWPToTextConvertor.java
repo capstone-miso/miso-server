@@ -18,7 +18,6 @@ public class HWPToTextConvertor {
         try {
             HWPFile hwpFile = HWPReader.fromFile(dir + fileName);
             String hwpText = TextExtractor.extract(hwpFile, TextExtractMethod.InsertControlTextBetweenParagraphText);
-
             System.out.println(hwpText);
         } catch (Exception e) {
             throw new RuntimeException(e);
