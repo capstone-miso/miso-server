@@ -18,9 +18,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileListService {
     private final FileRepository fileRepository;
-    public Files saveDownloadedFileInfo(String name, String url){
+    public Files saveDownloadedFileInfo(String fileName, String url){
         Files file = Files.builder()
-                .name(name)
+                .title(fileName)
                 .fileUrl(url)
                 .converted(false)
                 .build();

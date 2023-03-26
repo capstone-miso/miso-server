@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import jakarta.persistence.Entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -28,8 +29,11 @@ public class Files {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fid;
-    private String name;
+    private String title;
+    private String department;
+    private String fileName;
     private String fileUrl;
+    private LocalDate fileUploaded;
     private boolean converted;
     private LocalDateTime createdAt;
 

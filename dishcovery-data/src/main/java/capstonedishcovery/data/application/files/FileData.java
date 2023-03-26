@@ -10,7 +10,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
@@ -23,14 +24,13 @@ public class FileData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fid;
-    private String name;
-    private LocalDateTime useDate;
-    private String area;
-    @NotEmpty
-    private String department;
+    @NotNull
+    private LocalDate date;
+    @NotNull
+    private LocalTime time;
     @NotEmpty
     private String storeName;
-    private String address;
+    private String storeAddress;
     private String purpose;
     @NotNull
     private Integer participants;

@@ -123,9 +123,6 @@ public class EXCELToTextConvertor {
                     ((LocalDateTime) rowObj.get(2)).toLocalTime()
             );
             FileData fileData = FileData.builder()
-                    .name((String) rowObj.get(0))
-                    .useDate(useDate)
-                    .department(department)
                     .storeName((String) rowObj.get(3))
                     .purpose((String) rowObj.get(4))
                     .participants((Integer) rowObj.get(5))
