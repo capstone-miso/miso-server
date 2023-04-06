@@ -1,4 +1,4 @@
-package capstonedishcovery.data.domain;
+package capstone.miso.dishcovery.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

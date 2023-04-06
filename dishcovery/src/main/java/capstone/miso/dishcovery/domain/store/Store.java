@@ -1,4 +1,4 @@
-package capstonedishcovery.data.domain.store;
+package capstone.miso.dishcovery.domain.store;
 
 /**
  * author        : duckbill413
@@ -6,10 +6,10 @@ package capstonedishcovery.data.domain.store;
  * description   :
  **/
 
-import capstonedishcovery.data.application.files.FileData;
-import capstonedishcovery.data.domain.BaseEntity;
-import capstonedishcovery.data.domain.storeimg.StoreImg;
-import capstonedishcovery.data.domain.menu.Menu;
+import capstone.miso.dishcovery.application.files.FileData;
+import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.menu.Menu;
+import capstone.miso.dishcovery.domain.storeimg.StoreImg;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package capstonedishcovery.data.application.files;
+package capstone.miso.dishcovery.application.files;
 
 /**
  * author        : duckbill413
@@ -6,8 +6,8 @@ package capstonedishcovery.data.application.files;
  * description   :
  **/
 
-import capstonedishcovery.data.domain.BaseEntity;
-import capstonedishcovery.data.domain.store.Store;
+import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -15,13 +15,10 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Date;
 import java.util.Objects;
-import java.util.TimeZone;
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package capstonedishcovery.data.application.controller;
+package capstone.miso.dishcovery.application.controller;
 
 /**
  * author        : duckbill413

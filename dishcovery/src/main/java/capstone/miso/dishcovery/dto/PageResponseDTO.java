@@ -1,9 +1,8 @@
-package capstonedishcovery.data.dto;
+package capstone.miso.dishcovery.dto;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
-import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 

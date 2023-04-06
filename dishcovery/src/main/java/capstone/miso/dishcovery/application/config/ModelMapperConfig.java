@@ -1,4 +1,4 @@
-package capstonedishcovery.data.application.config;
+package capstone.miso.dishcovery.application.config;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;

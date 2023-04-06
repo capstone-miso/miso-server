@@ -1,6 +1,6 @@
-package capstonedishcovery.data.domain.member.repository;
+package capstone.miso.dishcovery.domain.member.repository;
 
-import capstonedishcovery.data.domain.member.Member;
+import capstone.miso.dishcovery.domain.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

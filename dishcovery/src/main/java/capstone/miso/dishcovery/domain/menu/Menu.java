@@ -1,12 +1,12 @@
-package capstonedishcovery.data.domain.menu;
+package capstone.miso.dishcovery.domain.menu;
 
 /**
  * author        : duckbill413
  * date          : 2023-03-29
  * description   :
  **/
-import capstonedishcovery.data.domain.BaseEntity;
-import capstonedishcovery.data.domain.store.Store;
+import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
 

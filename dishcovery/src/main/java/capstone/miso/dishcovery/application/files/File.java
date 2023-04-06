@@ -1,16 +1,16 @@
-package capstonedishcovery.data.application.files;
+package capstone.miso.dishcovery.application.files;
 
 /**
  * author        : duckbill413
  * date          : 2023-03-21
  * description   :
  **/
-import capstonedishcovery.data.domain.BaseEntity;
+
+import capstone.miso.dishcovery.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

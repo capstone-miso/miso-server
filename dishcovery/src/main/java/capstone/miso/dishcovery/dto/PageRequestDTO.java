@@ -1,4 +1,4 @@
-package capstonedishcovery.data.dto;
+package capstone.miso.dishcovery.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

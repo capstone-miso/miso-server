@@ -1,6 +1,7 @@
-package capstonedishcovery.data.application.files.repository;
+package capstone.miso.dishcovery.application.files.repository;
 
-import capstonedishcovery.data.application.files.File;
+
+import capstone.miso.dishcovery.application.files.File;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

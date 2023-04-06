@@ -1,4 +1,4 @@
-package capstonedishcovery.data.application.files;
+package capstone.miso.dishcovery.application.files;
 
 /**
  * author        : duckbill413

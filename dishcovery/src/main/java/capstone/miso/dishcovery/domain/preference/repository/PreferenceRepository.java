@@ -1,7 +1,8 @@
-package capstonedishcovery.data.domain.preference.repository;
+package capstone.miso.dishcovery.domain.preference.repository;
 
-import capstonedishcovery.data.domain.member.Member;
-import capstonedishcovery.data.domain.preference.Preference;
+
+import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.preference.Preference;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

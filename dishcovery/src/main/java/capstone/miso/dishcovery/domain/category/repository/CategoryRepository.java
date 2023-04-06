@@ -1,7 +1,8 @@
-package capstonedishcovery.data.domain.category.repository;
+package capstone.miso.dishcovery.domain.category.repository;
 
-import capstonedishcovery.data.domain.category.Category;
-import capstonedishcovery.data.domain.store.Store;
+
+import capstone.miso.dishcovery.domain.category.Category;
+import capstone.miso.dishcovery.domain.store.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
