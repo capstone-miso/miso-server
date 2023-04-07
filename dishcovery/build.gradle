@@ -34,6 +34,13 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-common:2.0.2'
     // model mapper
     implementation 'org.modelmapper:modelmapper:3.1.1'
+    // gson
+    implementation 'com.google.code.gson:gson:2.10.1'
+    // jwt
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1' // jdk 8이상 필요
+
+
 
 //    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
@@ -43,6 +50,9 @@ dependencies {
     implementation 'kr.dogfoot:hwplib:1.1.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
 }
 
 tasks.named('test') {
