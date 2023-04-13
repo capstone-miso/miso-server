@@ -16,8 +16,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
@@ -32,6 +32,7 @@ dependencies {
     // swagger - springdoc
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
     implementation 'org.springdoc:springdoc-openapi-starter-common:2.0.2'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
     // model mapper
     implementation 'org.modelmapper:modelmapper:3.1.1'
     // gson
@@ -40,18 +41,20 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.1' // jdk 8이상 필요
 
-
-
-//    implementation 'org.apache.pdfbox:pdfbox:3.0.0-RC1'
     // https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox
     implementation 'org.apache.pdfbox:pdfbox:2.0.27'
-// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.pdfbox:pdfbox-tools:2.0.27'
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+
     implementation 'kr.dogfoot:hwplib:1.1.1'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    // https://mvnrepository.com/artifact/org.jsoup/jsoup
+    implementation 'org.jsoup:jsoup:1.15.4'
+
+    implementation 'org.springframework.batch:spring-batch-core:5.0.0'
 
 }
 

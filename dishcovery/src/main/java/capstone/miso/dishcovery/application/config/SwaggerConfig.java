@@ -1,8 +1,10 @@
 package capstone.miso.dishcovery.application.config;
 
 import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,37 +16,37 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     private final String JWT = "JWT";
+
+    private Info info(){
+        Info info = new Info()
+                .title("Dishcovery")
+                .version("v0.0.1")
+                .description("Capstone design team. miso's project");
+        return info;
+    }
     @Bean
     public OpenAPI openAPI(){
         return new OpenAPI()
                 .components(new Components())
-                .info(this.info());
-    }
-
-    private Info info(){
-        Info info = new Info()
-                .title("Boot 01 Project Swagger")
-                .version("v0.0.1")
-                .description("자바 웹 개발 워크북 실습 내용");
-        return info;
-    }
-
-    /* Swagger JWT 적용
-    @Bean
-    public OpenAPI openAPI() {
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(JWT); // 헤더에 토큰 포함
-        Components components = new Components().addSecuritySchemes(jwt, new SecurityScheme()
-                .name(JWT)
-                .type(SecurityScheme.Type.HTTP)
-                .scheme("bearer")
-                .bearerFormat("JWT")
-        );
-
-        return new OpenAPI()
                 .info(this.info())
-                .addSecurityItem(securityRequirement)
-                .components(components);
+                .externalDocs(new ExternalDocumentation()
+                        .description("Springdoc-openapi 문서 보러가기")
+                        .url("http://springdoc.org"));
     }
 
-     */
+//    @Bean
+//    public OpenAPI openAPI() {
+//        SecurityRequirement securityRequirement = new SecurityRequirement().addList(JWT); // 헤더에 토큰 포함
+//        Components components = new Components().addSecuritySchemes(JWT, new SecurityScheme()
+//                .name(JWT)
+//                .type(SecurityScheme.Type.HTTP)
+//                .scheme("bearer")
+//                .bearerFormat("JWT")
+//        );
+//
+//        return new OpenAPI()
+//                .info(this.info())
+//                .addSecurityItem(securityRequirement)
+//                .components(components);
+//    }
 }

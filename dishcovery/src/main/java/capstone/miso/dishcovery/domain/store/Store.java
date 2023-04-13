@@ -39,4 +39,12 @@ public class Store extends BaseEntity {
     private List<Menu> menus = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StoreImg> storeImgs = new ArrayList<>();
+
+    public void addFileData(FileData fileData){
+        this.fileDataList.add(fileData);
+
+        if (fileData.getStore() != this){
+            fileData.setStore(this);
+        }
+    }
 }
