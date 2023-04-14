@@ -26,25 +26,51 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Store extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sid;
     private String name;
     private Double lat;
     private Double lon;
+    private String address;
     private String sector;
     private String phone;
-    @OneToMany(mappedBy = "store", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<FileData> fileDataList = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StoreImg> storeImgs = new ArrayList<>();
 
     public void addFileData(FileData fileData){
+        if (fileData == null){
+            return;
+        }
         this.fileDataList.add(fileData);
 
         if (fileData.getStore() != this){
             fileData.setStore(this);
+        }
+    }
+    public void addStoreImg(StoreImg storeImg){
+        if (storeImg == null){
+            return;
+        }
+
+        this.storeImgs.add(storeImg);
+
+        if (storeImg.getStore() != this){
+            storeImg.setStore(this);
+        }
+    }
+
+    public void addMenu(Menu menu){
+        if (menu == null){
+            return;
+        }
+
+        this.menus.add(menu);
+        if (menu.getStore() != this){
+            menu.setStore(this);
         }
     }
 }
