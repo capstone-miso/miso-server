@@ -22,7 +22,7 @@ public class StoreImg extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long sid;
-    private String storeImg;
+    private String imageUrl;
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;
