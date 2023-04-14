@@ -19,10 +19,11 @@ public class FileItemListener {
     private final FileRepository fileRepository;
     @AfterJob
     public void showJobResult(JobExecution jobExecution) {
+
         int failCnt = fileRepository.findByConverted(false).orElse(new ArrayList<>()).size();
         int successCnt = fileRepository.findByConverted(true).orElse(new ArrayList<>()).size();
         int total = failCnt + successCnt;
 
-        log.info("File loading Job 실행 결과: " + successCnt + "/" + total);
+        log.info("전체 File Job 실행 결과: " + successCnt + "/" + total);
     }
 }

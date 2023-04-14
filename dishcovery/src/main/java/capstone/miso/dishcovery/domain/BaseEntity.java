@@ -1,8 +1,6 @@
 package capstone.miso.dishcovery.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.cglib.core.Local;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,9 +18,22 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
-    @Column(updatable = false)
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
     @LastModifiedDate
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist(){
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+    @PreUpdate
+    public void preUpdate(){
+        LocalDateTime now = LocalDateTime.now();
+        this.updatedAt = now;
+    }
 }
