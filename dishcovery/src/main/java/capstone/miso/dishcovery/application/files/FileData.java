@@ -63,6 +63,9 @@ public class FileData extends BaseEntity {
         // 날짜 수정 23 -> 2023 년
         if (date.matches("\\d{2}-\\d{1,2}-\\d{1,2}"))
             date = "20" + date;
+        if (date.matches("\\d{1,2}-\\d{1,2}")){
+            date = files.getFileUploaded().toString();
+        }
         DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
                 .appendPattern("[yyyy-MM-dd]")
                 .appendPattern("[MM-dd]")

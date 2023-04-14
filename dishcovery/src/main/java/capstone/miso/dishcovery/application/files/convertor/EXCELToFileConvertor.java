@@ -17,7 +17,7 @@ import java.util.*;
  * description   :
  **/
 @Component
-public class EXCELToTextConvertor {
+public class EXCELToTextConvertor implements TextConvertor{
     private final static String[] date = {"일자", "집행일"};
     private final static String[] time = {"시간", "시각"};
     private final static String[] storeName = {"장소"};
@@ -42,12 +42,17 @@ public class EXCELToTextConvertor {
 
                 int rows = sheet.getLastRowNum();
                 int cols = sheet.getRow(0).getLastCellNum();
+                if (rows < 0 || cols < 0){
+                    continue;
+                }
 
                 String[] keys = new String[cols];
                 HashMap<String, List<String>> data = new HashMap<>();
 
                 for (int i = 0; i <= rows; i++) {
                     Row row = sheet.getRow(i);
+                    if (row == null)
+                        continue;
 
                     for (int j = 0; j < cols; j++) {
                         Cell cell = row.getCell(j);

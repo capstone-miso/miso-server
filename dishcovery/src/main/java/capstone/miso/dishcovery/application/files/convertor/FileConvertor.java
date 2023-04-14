@@ -9,7 +9,5 @@ import capstone.miso.dishcovery.application.files.Files;
  **/
 
 public interface TextConvertor {
-    void convertToText(Files files);
-    void parseText();
-    FileData parseFile();
+    FileData parseFileToFileDataes();
 }
