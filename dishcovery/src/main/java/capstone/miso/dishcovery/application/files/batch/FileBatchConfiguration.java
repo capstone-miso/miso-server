@@ -35,15 +35,14 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 @EnableScheduling
 public class FileBatchConfiguration {
-    private final int CHUNK_SIZE = 500;
     private final String JOB_NAME = "fileJob";
     private final FileService fileService;
     private final FileRepository fileRepository;
     private final JobLauncher jobLauncher;
 
-    @Scheduled(cron = "0 46 17 * * ?")
+    @Scheduled(cron = "0 0 5 * * ?")
     public void runLoadingJob() throws Exception {
-        log.info("------------Scheduled-----------------------");
+        log.info("Scheduled File Loading");
         jobLauncher.run(fileLoadingJob(null, null), new JobParametersBuilder()
                 .addString("sdate", LocalDate.now().minusDays(1L).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .addLong("timestamp", System.currentTimeMillis())
@@ -52,7 +51,8 @@ public class FileBatchConfiguration {
 
     @Bean
     public Job fileLoadingJob(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
-        return new JobBuilder(JOB_NAME, jobRepository).incrementer(new RunIdIncrementer())
+        return new JobBuilder(JOB_NAME, jobRepository)
+                .incrementer(new RunIdIncrementer())
                 .listener(new FileItemListener(fileRepository))
                 .start(fileFindStep(jobRepository, transactionManager, null, null))
                 .next(fileDownloadStep(jobRepository, transactionManager))
@@ -65,7 +65,7 @@ public class FileBatchConfiguration {
     public Step fileFindStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                              @Value("#{jobParameters[sdate]}") String sdate,
                              @Value("#{jobParameters[edate]}") String edate) {
-        log.info("File loading... Start DATE: " + sdate);
+        log.info("File loading... Start DATE: " + sdate + " End DATE: " + edate);
         return new StepBuilder(JOB_NAME + "LoadStep", jobRepository)
                 .tasklet((contribution, chunkContext) -> {
                     fileService.loadFiles(null, sdate, edate);
@@ -91,5 +91,23 @@ public class FileBatchConfiguration {
                     fileService.convertFileToFileData();
                     return RepeatStatus.FINISHED;
                 }, transactionManager).build();
+    }
+
+    @Bean
+    public Job retryConvertJob(JobRepository jobRepository, PlatformTransactionManager transactionManager){
+        return new JobBuilder(JOB_NAME + "Retry", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .listener(new FileItemListener(fileRepository))
+                .start(retryFileConvertStep(jobRepository, transactionManager))
+                .build();
+    }
+
+    private Step retryFileConvertStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder(JOB_NAME + "RetryConvertStep", jobRepository)
+                .tasklet((contribution, chunkContext) -> {
+                    fileService.convertFailedFileToFileData();
+                    return RepeatStatus.FINISHED;
+                }, transactionManager)
+                .build();
     }
 }
