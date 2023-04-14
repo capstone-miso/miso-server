@@ -17,7 +17,7 @@ import java.util.*;
  * description   :
  **/
 @Component
-public class EXCELToTextConvertor implements TextConvertor{
+public class EXCELToFileConvertor implements FileConvertor {
     private final static String[] date = {"일자", "집행일"};
     private final static String[] time = {"시간", "시각"};
     private final static String[] storeName = {"장소"};
@@ -27,7 +27,8 @@ public class EXCELToTextConvertor implements TextConvertor{
     private final static String[] cost = {"금액", "집행액"};
     private final static String[] paymentOption = {"결제방법"};
     private final static String[] expenditure = {"비목"};
-    public List<FileData> convertFileToFileData(Files file) {
+    @Override
+    public List<FileData> parseFileToFileData(Files file) {
         String path = "D:\\downloads\\";
         String testFileName = file.getFileName();
         String src = path + testFileName;

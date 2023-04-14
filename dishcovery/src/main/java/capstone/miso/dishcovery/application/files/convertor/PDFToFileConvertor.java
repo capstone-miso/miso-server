@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  **/
 @Log4j2
 @Component
-public class PDFToTextConvertor {
+public class PDFToFileConvertor implements FileConvertor {
     private final int CASE_OPTION_CNT = 13;
 
     private List<FileData> parsingString(String source, Files file) {
@@ -399,39 +399,6 @@ public class PDFToTextConvertor {
 
         return fileData;
     }
-    /*
-    private FileData template(List<String> row, Files file){
-        List<String> d = Arrays.stream(row.get().split("\\D{1,3}")).toList();
-        List<String> t = Arrays.stream(row.get().split("\\D{1,3}")).toList();
-        // 업무추진비 시간 구하기
-        String date = String.join("-", d);
-        String time = String.join("-", t);
-
-        String storeName = null;
-        String storeAddress = null;
-        String purpose = null;
-        String participants = null;
-        String cost = null;
-        String paymentOption = null;
-        String expenditure = null;
-
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
-    }
-     */
-
     private FileData case2(List<String> row, Files file) {
         List<String> d = Arrays.stream(row.get(0).split("\\D{1,3}")).toList();
         List<String> t = Arrays.stream(row.get(1).split("\\D{1,3}")).toList();
@@ -541,8 +508,8 @@ public class PDFToTextConvertor {
             return lastElement;
         } else return null;
     }
-
-    public List<FileData> convertFileToFileData(Files file) {
+    @Override
+    public List<FileData> parseFileToFileData(Files file) {
         String path = "D:\\downloads\\";
         String fileName = file.getFileName();
         String src = path + fileName;
@@ -560,3 +527,35 @@ public class PDFToTextConvertor {
         return null;
     }
 }
+    /*
+    private FileData template(List<String> row, Files file){
+        List<String> d = Arrays.stream(row.get().split("\\D{1,3}")).toList();
+        List<String> t = Arrays.stream(row.get().split("\\D{1,3}")).toList();
+        // 업무추진비 시간 구하기
+        String date = String.join("-", d);
+        String time = String.join("-", t);
+
+        String storeName = null;
+        String storeAddress = null;
+        String purpose = null;
+        String participants = null;
+        String cost = null;
+        String paymentOption = null;
+        String expenditure = null;
+
+        FileData fileData = FileData.builder()
+                .date(date)
+                .time(time)
+                .storeName(storeName)
+                .storeAddress(storeAddress)
+                .purpose(purpose)
+                .participants(participants)
+                .cost(cost)
+                .paymentOption(paymentOption)
+                .expenditure(expenditure)
+                .files(file)
+                .build();
+
+        return fileData;
+    }
+     */

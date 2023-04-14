@@ -2,8 +2,8 @@ package capstone.miso.dishcovery.application.files.service;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.application.files.Files;
-import capstone.miso.dishcovery.application.files.convertor.EXCELToTextConvertor;
-import capstone.miso.dishcovery.application.files.convertor.PDFToTextConvertor;
+import capstone.miso.dishcovery.application.files.convertor.EXCELToFileConvertor;
+import capstone.miso.dishcovery.application.files.convertor.PDFToFileConvertor;
 import capstone.miso.dishcovery.application.files.download.DownloadFileComponent;
 import capstone.miso.dishcovery.application.files.repository.FileDataRepository;
 import capstone.miso.dishcovery.application.files.repository.FileRepository;
@@ -35,8 +35,8 @@ public class FileService {
     private final FileDataRepository fileDataRepository;
     private final DownloadFileComponent downloadFileComponent;
     private final GwangjinFileComponent gwangjinFileComponent;
-    private final EXCELToTextConvertor excelToTextConvertor;
-    private final PDFToTextConvertor pdfToTextConvertor;
+    private final EXCELToFileConvertor excelToTextConvertor;
+    private final PDFToFileConvertor pdfToTextConvertor;
     private final ModelMapper modelMapper;
 
     public void changeFileConvertedStatus(Long fid) {
@@ -94,8 +94,8 @@ public class FileService {
         List<FileData> fileDataList = new ArrayList<>();
         for (Files f : files) {
             List<FileData> fileData = switch (f.getFileFormat()) {
-                case "pdf" -> pdfToTextConvertor.convertFileToFileData(f);
-                case "xls", "xlsx" -> excelToTextConvertor.convertFileToFileData(f);
+                case "pdf" -> pdfToTextConvertor.parseFileToFileData(f);
+                case "xls", "xlsx" -> excelToTextConvertor.parseFileToFileData(f);
                 default -> {
                     f.setConverted(false);
                     f.setConvertResult("Not supported format: " + f.getFileFormat());
@@ -128,8 +128,8 @@ public class FileService {
         List<FileData> fileDataList = new ArrayList<>();
         for (Files f : files) {
             List<FileData> fileData = switch (f.getFileFormat()) {
-                case "pdf" -> pdfToTextConvertor.convertFileToFileData(f);
-                case "xls", "xlsx" -> excelToTextConvertor.convertFileToFileData(f);
+                case "pdf" -> pdfToTextConvertor.parseFileToFileData(f);
+                case "xls", "xlsx" -> excelToTextConvertor.parseFileToFileData(f);
                 default -> {
                     f.setConverted(false);
                     f.setConvertResult("Not supported format: " + f.getFileFormat());
