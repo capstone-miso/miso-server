@@ -3,7 +3,7 @@ package capstone.miso.dishcovery.domain.storeimg.service;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.storeimg.StoreImg;
 import capstone.miso.dishcovery.domain.storeimg.dto.StoreImageDto;
-import capstone.miso.dishcovery.dto.StoreImgDto;
+import capstone.miso.dishcovery.domain.storeimg.dto.StoreImgDTO;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +52,7 @@ public class StoreImgService {
         }
     }
 
-    public StoreImgDto getStoreImgs(Store store, String moreId, String basis) {
+    public StoreImgDTO getStoreImgs(Store store, String moreId, String basis) {
         if (moreId == null)
             moreId = "";
 
@@ -68,7 +68,7 @@ public class StoreImgService {
 
             storeImageDto.getPhotoViewer().getList().forEach(photo -> images.add(photo.url));
 
-            StoreImgDto storeImgDto = new StoreImgDto(
+            StoreImgDTO storeImgDto = new StoreImgDTO(
                     storeImageDto.getPhotoViewer().placenamefull,
                     storeImageDto.getPhotoViewer().type,
                     storeImageDto.getPhotoViewer().basis,

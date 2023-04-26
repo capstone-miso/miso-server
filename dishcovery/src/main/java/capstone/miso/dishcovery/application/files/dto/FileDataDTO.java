@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.dto;
+package capstone.miso.dishcovery.application.files.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,7 +8,7 @@ import java.time.LocalTime;
  * date          : 2023-04-13
  * description   :
  **/
-public record FileDataDto(
+public record FileDataDTO(
         Long fid,
         LocalDate date,
         LocalTime time,

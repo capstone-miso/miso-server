@@ -14,10 +14,8 @@ import java.util.Optional;
  * description   :
  **/
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
-    @EntityGraph(attributePaths = "roleSet")
-    @Query("select m from Member m where m.mid = :mid")
-    Optional<Member> getWithRoles(@Param("mid") Long mid);
+public interface MemberRepository extends JpaRepository<Member, String> {
     @EntityGraph(attributePaths = "roleSet")
     Optional<Member> findByEmail(@Param("email") String email);
+    boolean existsByNickname(String nickname);
 }

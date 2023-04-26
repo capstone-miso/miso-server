@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.dto;
+package capstone.miso.dishcovery.application.files.dto;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
