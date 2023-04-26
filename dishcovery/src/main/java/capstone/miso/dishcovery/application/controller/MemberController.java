@@ -3,6 +3,8 @@ package capstone.miso.dishcovery.application.controller;
 import capstone.miso.dishcovery.domain.member.exception.MemberValidationException;
 import capstone.miso.dishcovery.domain.member.service.MemberService;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
@@ -22,9 +24,11 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
+@Tag(name = "Member", description = "Member controller")
 public class MemberController {
     private final MemberService memberService;
 
+    @Operation(summary = "회원 닉네임 변경")
     @PostMapping(value = "/nickname", produces = "application/json;charset=UTF-8")
     @PreAuthorize("isAuthenticated()")
     public String updateNickname(@RequestBody @Valid Map<String, @NotEmpty String> nickname,
@@ -39,13 +43,8 @@ public class MemberController {
         if (bindingResult.hasErrors()) {
             throw new MemberValidationException(bindingResult);
         }
+
         memberService.updateNickname(member.getEmail(), nickname.get("nickname"));
         return "닉네임 업데이트 성공";
-    }
-
-    @GetMapping("/anomynous")
-    @PreAuthorize("isAuthenticated()")
-    public String whoareyou() {
-        return "HIHI";
     }
 }
