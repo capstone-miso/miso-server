@@ -8,8 +8,8 @@ import capstone.miso.dishcovery.application.files.download.DownloadFileComponent
 import capstone.miso.dishcovery.application.files.repository.FileDataRepository;
 import capstone.miso.dishcovery.application.files.repository.FileRepository;
 import capstone.miso.dishcovery.application.files.search.GwangjinFileComponent;
-import capstone.miso.dishcovery.dto.FileDataDto;
-import capstone.miso.dishcovery.dto.FileDto;
+import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
+import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -150,25 +150,25 @@ public class FileService {
         fileRepository.saveAll(files);
     }
 
-    public List<FileDto> getFileAndFileData() {
+    public List<FileDTO> getFileAndFileData() {
         List<Files> result = fileRepository.findAllFileAndData();
 
-        List<FileDto> fileDtos = new ArrayList<>();
+        List<FileDTO> fileDTOS = new ArrayList<>();
         for (Files file : result) {
-            List<FileDataDto> fileDataDtos = new ArrayList<>();
+            List<FileDataDTO> fileDataDTOS = new ArrayList<>();
             file.getFileDataList().forEach(f -> {
-                FileDataDto tmp = new FileDataDto(f.getFid(), f.getDate(), f.getTime(), f.getStoreName(), f.getStoreAddress(), f.getParticipants(), f.getCost());
-                fileDataDtos.add(tmp);
+                FileDataDTO tmp = new FileDataDTO(f.getFid(), f.getDate(), f.getTime(), f.getStoreName(), f.getStoreAddress(), f.getParticipants(), f.getCost());
+                fileDataDTOS.add(tmp);
             });
 
-            FileDto fileDto = new FileDto(file.getFid(), file.getRegion(), file.getDepartment(),
+            FileDTO fileDto = new FileDTO(file.getFid(), file.getRegion(), file.getDepartment(),
                     file.getFileName(), file.getFileUrl(), file.getFileUploaded(), file.isFileDownloaded(), file.isConverted(),
-                    file.getConvertResult(), fileDataDtos);
+                    file.getConvertResult(), fileDataDTOS);
 
-            fileDtos.add(fileDto);
+            fileDTOS.add(fileDto);
         }
 
-        return fileDtos;
+        return fileDTOS;
     }
 
     public void checkFileExists() {

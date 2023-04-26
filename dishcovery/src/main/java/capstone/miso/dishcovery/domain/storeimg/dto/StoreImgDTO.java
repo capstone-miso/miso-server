@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.dto;
+package capstone.miso.dishcovery.domain.storeimg.dto;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import java.util.List;
  * description   :
  **/
 
-public record StoreImgDto(
+public record StoreImgDTO(
         String placeName,
         String type,
         String basis,

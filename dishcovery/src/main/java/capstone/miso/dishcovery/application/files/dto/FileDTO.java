@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.dto;
+package capstone.miso.dishcovery.application.files.dto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  * description   :
  **/
 
-public record FileDto(
+public record FileDTO(
         Long fid,
         String region,
         String department,
@@ -19,6 +19,6 @@ public record FileDto(
         boolean fileDownloaded,
         boolean converted,
         String convertResult,
-        List<FileDataDto> fileData
+        List<FileDataDTO> fileData
 ) {
 }
