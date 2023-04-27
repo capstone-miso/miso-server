@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.domain.category.controller;
+package capstone.miso.dishcovery.domain.keyword.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
  * description   :
  **/
 @RestController
-@RequestMapping("/categorys")
+@RequestMapping("/keyword")
 @Tag(name = "구수핟넹")
-public class CategoryController {
+public class KeywordController {
     @GetMapping("")
     public String check(){
         return "작동 중이야~~~";

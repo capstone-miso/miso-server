@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.domain.category;
+package capstone.miso.dishcovery.domain.keyword;
 
 /**
  * author        : duckbill413
@@ -18,11 +18,11 @@ import lombok.*;
 @Entity
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Category extends BaseEntity {
+public class Keyword extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cid;
-    private String keyword; // FIXME
+    private Long kid;
+    private String keywordKeys;
     private String reason;
     @ManyToOne
     @JoinColumn(name = "store_id")

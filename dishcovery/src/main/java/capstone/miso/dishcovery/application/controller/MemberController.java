@@ -24,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
-@Tag(name = "Member", description = "Member controller")
+@Tag(name = "회원", description = "Member controller")
 public class MemberController {
     private final MemberService memberService;
 

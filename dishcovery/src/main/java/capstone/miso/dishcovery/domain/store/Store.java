@@ -31,6 +31,7 @@ public class Store extends BaseEntity {
     private Double lat;
     private Double lon;
     private String address;
+    private String category;
     private String sector;
     private String phone;
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
