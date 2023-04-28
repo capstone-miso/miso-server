@@ -22,35 +22,36 @@ import java.util.Objects;
 @Entity
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class File extends BaseEntity {
+@Table(name = "file")
+public class Files extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fid;
-    @Enumerated(EnumType.STRING)
-    private Region region;
     @NonNull
-    private String title;
+    private String region;
     @NonNull
     private String department;
     @NonNull
     private String fileName;
+    @NonNull
+    private String fileFormat;
     @NonNull
     private String fileUrl;
     @NonNull
     private LocalDate fileUploaded;
     private boolean fileDownloaded;
     private boolean converted;
-    @OneToMany(mappedBy = "file", cascade = CascadeType.PERSIST)
+    private String convertResult;
+    @OneToMany(mappedBy = "files", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     private List<FileData> fileDataList = new ArrayList<>();
 
     public void changeConvertStatus(boolean status){
         this.converted = status;
     }
     @Builder
-    public File(Region region, String title, String department, String fileName, String fileUrl, LocalDate fileUploaded, boolean converted) {
+    public Files(String region, String department, String fileName, String fileUrl, LocalDate fileUploaded, boolean converted) {
         this.region = region;
-        this.title = title;
         this.department = department;
         this.fileName = fileName;
         this.fileUrl = fileUrl;
@@ -59,8 +60,9 @@ public class File extends BaseEntity {
     }
     public void addFileData(FileData fileData){
         this.fileDataList.add(fileData);
-        if (fileData.getFile() != this){
-            fileData.setFile(this);
+
+        if (fileData.getFiles() != this){
+            fileData.setFiles(this);
         }
     }
 }

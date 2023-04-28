@@ -6,12 +6,15 @@ package capstone.miso.dishcovery.domain.member;
  * description   :
  **/
 import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.member.repository.MemberRepository;
 import capstone.miso.dishcovery.domain.preference.Preference;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,12 +26,18 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class Member extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long mid;
     private String email;
     private String password;
     private String nickname;
     private boolean alarm;
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    private Set<MemberRole> roleSet = new HashSet<>();
     @OneToMany(mappedBy = "member")
     private List<Preference> preferences = new ArrayList<>();
+
+    public void addRole(MemberRole memberRole){
+        this.roleSet.add(memberRole);
+    }
 }

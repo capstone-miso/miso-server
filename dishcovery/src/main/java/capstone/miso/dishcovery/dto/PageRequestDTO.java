@@ -24,15 +24,9 @@ public class PageRequestDTO {
     private int page = 1;
     @Builder.Default
     private int size = 10;
-    private String type;
+    private String category;
     private String keyword;
-    private String link;
-    public String[] getTypes(){
-        if (type == null || type.isEmpty())
-            return null;
-
-        return type.split("");
-    }
+    private String sector;
     public Pageable getPageable(String... props){
         return PageRequest.of(this.page - 1, this.size,
                 Sort.by(props).descending());

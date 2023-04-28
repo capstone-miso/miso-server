@@ -1,9 +1,12 @@
 package capstone.miso.dishcovery.application.files.repository;
 
-
-import capstone.miso.dishcovery.application.files.File;
+import capstone.miso.dishcovery.application.files.Files;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,6 +15,14 @@ import java.util.Optional;
  * description   :
  **/
 
-public interface FileRepository extends JpaRepository<File, Long> {
-    Optional<File> findByFileName(String fileName);
+public interface FileRepository extends JpaRepository<Files, Long> {
+    Optional<List<Files>> findByFileDownloaded(Boolean fileDownload);
+    int countByConvertedAndUpdatedAtAfter(Boolean converted, LocalDateTime dateTime);
+    @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList WHERE f.converted=false AND f.convertResult is null")
+    Optional<List<Files>> findNotConvertedWithFileData();
+    @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList WHERE f.converted=false")
+    Optional<List<Files>> findFailedConvertedWithFileData();
+    @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList")
+    List<Files> findAllFileAndData();
+    boolean existsByDepartmentAndFileUploaded(String department, LocalDate date);
 }
