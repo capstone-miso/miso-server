@@ -24,7 +24,7 @@ public class StoreShortDTO {
         private Double lat;
         private Double lon;
         private String category;
-        private String keyword;
+        private List<String> keywords;
         private String sector;
         private String imageUrl;
 }
