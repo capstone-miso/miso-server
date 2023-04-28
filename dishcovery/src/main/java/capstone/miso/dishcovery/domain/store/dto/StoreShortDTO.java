@@ -7,15 +7,24 @@ import capstone.miso.dishcovery.domain.storeimg.dto.StoreImgDTO;
  * date          : 2023-04-27
  * description   :
  **/
+import lombok.Data;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-public record StoreShortDTO(
-        Long sid,
-        String storeName,
-        Double lat,
-        Double lon,
-        String category,
-        String keyword,
-        String sector,
-        String imgUrl
-) {
+import java.util.List;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StoreShortDTO {
+        private Long sid;
+        private String storeName;
+        private Double lat;
+        private Double lon;
+        private String category;
+        private String keyword;
+        private String sector;
+        private String imageUrl;
 }

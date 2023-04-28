@@ -1,27 +1,24 @@
 package capstone.miso.dishcovery.domain.store.service;
 
-import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.storeimg.QStoreImg;
-import capstone.miso.dishcovery.domain.storeimg.StoreImg;
-import capstone.miso.dishcovery.domain.storeimg.dto.StoreImgDTO;
-import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.catalina.LifecycleState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.security.Key;
 import java.util.List;
 
 
@@ -49,25 +46,35 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             keywordCondition = StringUtils.isNotBlank(condition.keyword()) ? keyword.keywordKeys.contains(condition.keyword()) : null;
             sectorCondition = StringUtils.isNotBlank(condition.sector()) ? store.sector.containsIgnoreCase(condition.sector()) : null;
         }
-        JPQLQuery<Store> query = from(store);
-        query.leftJoin(keyword).on(keywordCondition);
-        query.leftJoin(storeImg);
-        query.where(categoryCondition);
-
-        List<Keyword> kq = from(keyword).on(keywordCondition).fetch();
-        List<StoreImg> sq = from(storeImg).groupBy(storeImg.store).fetch();
-
-        JPQLQuery<StoreShortDTO> dtoQuery = query.select(Projections.bean(StoreShortDTO.class,
-                store.sid,
-                store.name,
-                store.lat,
-                store.lon,
-                store.category,
-                keyword.keywordKeys,
-                store.sector,
-                storeImg.imageUrl));
-
-        this.getQuerydsl().applyPagination(pageable, dtoQuery);
+        Expression<String> subQuery1 = Expressions.stringTemplate("(SELECT k.keywordKeys FROM Keyword k WHERE k.store.sid = {0} ORDER BY k.kid ASC LIMIT 1)", store.sid);
+        Expression<String> subQuery2 = Expressions.stringTemplate("(SELECT si.imageUrl FROM StoreImg si WHERE si.store.sid = {0} ORDER BY si.sid ASC LIMIT 1)", store.sid);
+        /* JPA-JPQL의 GROUP_CONCAT 적용 시도 => 실패
+        Expression<String> subQuery1 = Expressions.stringTemplate("(SELECT GROUP_CONCAT(DISTINCT k.keywordKeys SEPARATOR ', ') FROM Keyword k WHERE k.store.sid = {0})", store.sid);
+        JPAExpressions.select(Expressions.stringTemplate("GROUP_CONCAT(DISTINCT {0} SEPARATOR ', ')", keyword.keywordKeys))
+     .from(keyword)
+     .where(keyword.store.sid.eq(store.sid))
+         */
+        JPQLQuery<StoreShortDTO> dtoQuery = from(store)
+                .innerJoin(keyword).on(store.sid.eq(keyword.store.sid).and(keywordCondition))
+                .leftJoin(storeImg).on(store.sid.eq(storeImg.store.sid))
+                .where(categoryCondition.and(sectorCondition))
+                .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector)
+                .select(Projections.fields(StoreShortDTO.class,
+                        store.sid,
+                        store.name.as("storeName"),
+                        store.lat,
+                        store.lon,
+                        store.category,
+                        store.sector,
+                        ExpressionUtils.as(
+                                subQuery1,
+                                "keyword"
+                        ),
+                        ExpressionUtils.as(
+                                subQuery2,
+                                "imageUrl"
+                        )
+                ));
 
         List<StoreShortDTO> dtoList = dtoQuery.fetch();
         long count = dtoQuery.fetchCount();

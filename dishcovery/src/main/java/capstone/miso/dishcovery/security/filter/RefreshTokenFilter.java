@@ -81,6 +81,9 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         }
 
         this.sendTokens(accessTokenValue, refreshTokenValue, response);
+
+//        response.addHeader("accessToken", accessTokenValue);
+//        response.addHeader("refreshToken", refreshTokenValue);
     }
     private Map<String, String> parseRequestJSON(HttpServletRequest request){
         try(Reader reader = new InputStreamReader(request.getInputStream())){
