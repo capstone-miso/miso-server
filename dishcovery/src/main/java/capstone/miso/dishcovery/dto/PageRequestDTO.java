@@ -9,6 +9,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * author        : duckbill413
  * date          : 2023-04-03
@@ -27,8 +31,20 @@ public class PageRequestDTO {
     private String category;
     private String keyword;
     private String sector;
-    public Pageable getPageable(String... props){
-        return PageRequest.of(this.page - 1, this.size,
-                Sort.by(props).descending());
+    private List<String> sort;
+    public Pageable getPageable(String... defaultProps) {
+        if (this.sort == null) {
+            this.sort = Arrays.stream(defaultProps).toList();
+        }
+        List<Sort.Order> orders = new ArrayList<>();
+        for (String s : sort) {
+            if (s.endsWith(".desc")) {
+                orders.add(new Sort.Order(Sort.Direction.DESC, s.substring(0, s.length() - 5)));
+            } else {
+                orders.add(new Sort.Order(Sort.Direction.ASC, s));
+            }
+        }
+        Sort sortBy = Sort.by(orders);
+        return PageRequest.of(this.page - 1, this.size, sortBy);
     }
 }

@@ -26,7 +26,7 @@ public class StoreServiceImpl implements StoreService {
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
         StoreSearchCondition condition = new StoreSearchCondition(pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector());
-        Pageable pageable = pageRequestDTO.getPageable("sid");
+        Pageable pageable = pageRequestDTO.getPageable("sid.desc");
 
         Page<StoreShortDTO> result = storeRepository.searchAllStoreShort(condition, pageable);
 

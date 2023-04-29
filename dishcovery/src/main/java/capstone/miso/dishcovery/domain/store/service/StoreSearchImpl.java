@@ -8,18 +8,21 @@ import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.storeimg.QStoreImg;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 /**
@@ -51,7 +54,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
                 .innerJoin(keyword).on(store.sid.eq(keyword.store.sid).and(keywordCondition))
                 .leftJoin(storeImg).on(store.sid.eq(storeImg.store.sid))
-                .where(categoryCondition.and(sectorCondition))
+                .where(categoryCondition)
+                .where(keywordCondition)
+                .where(sectorCondition)
                 .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector)
                 .select(Projections.fields(StoreShortDTO.class,
                         store.sid,
@@ -62,12 +67,39 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.sector,
                         ExpressionUtils.as(subQuery, "imageUrl")
                 ));
+        // MEMO: Order 조건 추가 가능
+        List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable, store);
+        dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
 
         List<StoreShortDTO> dtoList = dtoQuery.fetch();
         dtoList.forEach(this::addKeywordList);
         long count = dtoQuery.fetchCount();
 
         return new PageImpl<>(dtoList, pageable, count);
+    }
+
+    private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
+        List<OrderSpecifier<?>> orderSpecifiers = pageable.getSort().stream()
+                .map(order -> {
+                    if (order.getProperty().equalsIgnoreCase("sid")) {
+                        return order.isDescending() ? store.sid.desc() : store.sid.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("storeName")) {
+                        return order.isDescending() ? store.name.desc() : store.name.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("lat")) {
+                        return order.isDescending() ? store.lat.desc() : store.lat.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("lon")) {
+                        return order.isDescending() ? store.lon.desc() : store.lon.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("category")) {
+                        return order.isDescending() ? store.category.desc() : store.category.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("sector")) {
+                        return order.isDescending() ? store.sector.desc() : store.sector.asc();
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return orderSpecifiers;
     }
 
     private void addKeywordList(StoreShortDTO storeShortDTO) {
