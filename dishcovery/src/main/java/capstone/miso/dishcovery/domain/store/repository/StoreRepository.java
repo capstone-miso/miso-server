@@ -1,6 +1,7 @@
 package capstone.miso.dishcovery.domain.store.repository;
 
 import capstone.miso.dishcovery.domain.store.Store;
+import capstone.miso.dishcovery.domain.store.service.StoreSearch;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
