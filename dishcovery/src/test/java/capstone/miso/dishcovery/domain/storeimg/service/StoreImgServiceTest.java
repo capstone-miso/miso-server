@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 /**
  * author        : duckbill413
  * date          : 2023-04-14
@@ -31,5 +33,4 @@ class StoreImgServiceTest {
 
         storeRepository.save(store);
     }
-
 }

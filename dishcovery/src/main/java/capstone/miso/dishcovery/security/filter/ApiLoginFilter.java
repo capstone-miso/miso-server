@@ -29,7 +29,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         if (request.getMethod().equalsIgnoreCase("GET")){
-            log.error("GET METHOD NOT SUPPORT");
+            response.getWriter().println("GET Method not support");
             return null;
         }
 

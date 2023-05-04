@@ -152,7 +152,6 @@ public class FileService {
 
     public List<FileDTO> getFileAndFileData() {
         List<Files> result = fileRepository.findAllFileAndData();
-
         List<FileDTO> fileDTOS = new ArrayList<>();
         for (Files file : result) {
             List<FileDataDTO> fileDataDTOS = new ArrayList<>();

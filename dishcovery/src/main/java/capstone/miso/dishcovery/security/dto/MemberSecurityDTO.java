@@ -1,5 +1,7 @@
 package capstone.miso.dishcovery.security.dto;
 
+import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.member.MemberRole;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -40,5 +42,12 @@ public class MemberSecurityDTO extends User implements OAuth2User {
     @Override
     public String getName() {
         return this.email;
+    }
+    public Member getMember(){
+        return Member.builder()
+                .email(this.email)
+                .password(this.password)
+                .nickname(this.nickname)
+                .build();
     }
 }
