@@ -6,11 +6,15 @@ import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
+import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
+import capstone.miso.dishcovery.domain.store.service.StoreService;
+import capstone.miso.dishcovery.domain.store.service.StoreServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +36,8 @@ import java.util.Optional;
 public class StoreAndPreferenceService {
     private final StoreRepository storeRepository;
     private final PreferenceRepository preferenceRepository;
+    private final ModelMapper modelMapper;
+    private final StoreService storeService;
 
     public SavePreferenceRes savePreference(Member member, Long storeId) {
         Optional<Store> findStore = storeRepository.findById(storeId);
@@ -67,5 +73,18 @@ public class StoreAndPreferenceService {
             stores.addAll(storeShortDTOS.getContent());
         });
         return stores;
+    }
+
+    public List<StoreShortDTO> famousStore(int page, int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        var result = preferenceRepository.findFamousStores(pageRequest);
+        List<StoreShortDTO> famousStores=new ArrayList<>();
+        for (Long sid : result) {
+            StoreDetailDTO store =storeService.getStoreDetail(sid);
+            StoreShortDTO shortDTO = modelMapper.map(store, StoreShortDTO.class);
+            shortDTO.setStoreName(store.getName());
+            famousStores.add(shortDTO);
+        }
+        return famousStores;
     }
 }

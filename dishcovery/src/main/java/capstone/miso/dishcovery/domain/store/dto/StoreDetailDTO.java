@@ -26,8 +26,10 @@ public class StoreDetailDTO {
         private String address;
         private String category;
         private String sector;
+        private String mainImageUrl;
         private List<String> onInfo;
         private List<String> offInfo;
         private List<String> keywords;
         private List<MenuDTO> menus;
+        private List<String> images;
 }
