@@ -5,9 +5,10 @@ package capstone.miso.dishcovery.domain.member;
  * date          : 2023-03-29
  * description   :
  **/
+
 import capstone.miso.dishcovery.domain.BaseEntity;
-import capstone.miso.dishcovery.domain.member.repository.MemberRepository;
 import capstone.miso.dishcovery.domain.preference.Preference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,7 +38,7 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member")
     private List<Preference> preferences = new ArrayList<>();
 
-    public void addRole(MemberRole memberRole){
+    public void addRole(MemberRole memberRole) {
         this.roleSet.add(memberRole);
     }
 }

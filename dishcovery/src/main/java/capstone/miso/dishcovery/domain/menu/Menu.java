@@ -23,7 +23,9 @@ public class Menu extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long mid;
     private String name;
-    private Integer cost;
+    private String cost;
+    @Column(columnDefinition = "TEXT")
+    private String detail;
     private String menuImg;
     @ManyToOne
     @JoinColumn(name = "store_id")

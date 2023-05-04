@@ -28,16 +28,27 @@ public class PageRequestDTO {
     private int page = 1;
     @Builder.Default
     private int size = 10;
+    private Long storeId;
+    private String storeName;
     private String category;
     private String keyword;
     private String sector;
+    private Double lat;
+    private Double lon;
+    @Builder.Default
+    private Double multi = 1.0d;
     private List<String> sort;
+
     public Pageable getPageable(String... defaultProps) {
         if (this.sort == null) {
             this.sort = Arrays.stream(defaultProps).toList();
         }
         List<Sort.Order> orders = new ArrayList<>();
         for (String s : sort) {
+            if (s.endsWith(".asc")) {
+                s = s.substring(0, s.length() - 4);
+            }
+
             if (s.endsWith(".desc")) {
                 orders.add(new Sort.Order(Sort.Direction.DESC, s.substring(0, s.length() - 5)));
             } else {

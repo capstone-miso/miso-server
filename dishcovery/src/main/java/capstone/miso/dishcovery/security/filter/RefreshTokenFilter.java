@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 /**
  * author        : duckbill413
  * date          : 2023-04-26
@@ -33,7 +35,12 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
+
         if (!path.equalsIgnoreCase("/refreshToken")){
+            filterChain.doFilter(request, response);
+            return;
+        } else if (request.getMethod().equalsIgnoreCase("GET")) {
+            response.getWriter().println("GET Method not support");
             filterChain.doFilter(request, response);
             return;
         }

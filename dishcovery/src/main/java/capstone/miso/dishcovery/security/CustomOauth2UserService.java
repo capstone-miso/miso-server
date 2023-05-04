@@ -39,6 +39,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         Map<String, Object> paramMap = oAuth2User.getAttributes();
         Map<String, Object> socialUserDetails = switch (clientName) {
             case "kakao" -> getKakaoEmail(paramMap);
+            case "naver" -> getNaverEmail(paramMap);
             default -> throw new OAuth2AuthenticationException("Unsupported Login Client");
         };
 
@@ -47,6 +48,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
     private MemberSecurityDTO generateDTO(Map<String, Object> socialUserDetails, Map<String, Object> paramMap) {
         String email = (String) socialUserDetails.get("email");
+        String nickname = (String) socialUserDetails.get("nickname");
         Optional<Member> result = memberRepository.findByEmail(email);
 
         // 해당 이메일 사용자가 없으면 회원가입 진행
@@ -56,7 +58,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             Member member = Member.builder()
                     .email(email)
                     .password(passwordEncoder.encode(randomPassword))
-                    .nickname((String) paramMap.get("nickname"))
+                    .nickname(nickname)
                     .build();
             member.addRole(MemberRole.USER);
             Member savedMember = memberRepository.save(member);
@@ -85,9 +87,22 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         Object value = paramMap.get("kakao_account");
         LinkedHashMap accountMap = (LinkedHashMap) value;
 
+        Object profileValue = ((LinkedHashMap<?, ?>) value).get("profile");
+        LinkedHashMap profileMap = (LinkedHashMap) profileValue;
+
         return Map.of(
-                "email", accountMap.get("email")
-//                "nickname", accountMap.get("profile_nickname")
+                "email", accountMap.get("email"),
+                "nickname", profileMap.get("nickname")
+        );
+    }
+
+    private Map<String, Object> getNaverEmail(Map<String, Object> paramMap) {
+        Object value = paramMap.get("response");
+        LinkedHashMap accountMap = (LinkedHashMap) value;
+
+        return Map.of(
+                "email", accountMap.get("email"),
+                "nickname", accountMap.get("nickname")
         );
     }
 }

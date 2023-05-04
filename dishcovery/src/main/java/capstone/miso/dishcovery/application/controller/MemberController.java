@@ -29,7 +29,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @Operation(summary = "회원 닉네임 변경")
-    @PostMapping(value = "/nickname", produces = "application/json;charset=UTF-8")
+    @PatchMapping(value = "/nickname", produces = "application/json;charset=UTF-8")
     @PreAuthorize("isAuthenticated()")
     public String updateNickname(@RequestBody @Valid Map<String, @NotEmpty String> nickname,
                                  @AuthenticationPrincipal MemberSecurityDTO member,
