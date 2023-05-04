@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,8 +47,8 @@ public class FileController {
     @Operation(summary = "파일 및 파일 데이터 출력")
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<FileDTO> getFileAndFileData() {
-        List<FileDTO> result = fileService.getFileAndFileData();
+    public List<FileDTO> getFileAndFileData(@RequestParam(value = "page") int page) {
+        List<FileDTO> result = fileService.getFileAndFileData(page);
         return result;
     }
 }

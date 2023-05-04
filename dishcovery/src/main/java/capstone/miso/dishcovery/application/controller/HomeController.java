@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Log4j2
 @Controller
 @RequiredArgsConstructor
+@Tag(name = "Home", description = "도메인 접속시 로그인 화면으로 리다이렉트")
 public class HomeController {
     @RequestMapping(value = "/", method = {RequestMethod.POST, RequestMethod.GET})
     public String redirectToLogin(){

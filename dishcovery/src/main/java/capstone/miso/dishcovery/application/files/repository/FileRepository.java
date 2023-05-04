@@ -1,6 +1,8 @@
 package capstone.miso.dishcovery.application.files.repository;
 
 import capstone.miso.dishcovery.application.files.Files;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,6 +25,6 @@ public interface FileRepository extends JpaRepository<Files, Long> {
     @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList WHERE f.converted=false")
     Optional<List<Files>> findFailedConvertedWithFileData();
     @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList")
-    List<Files> findAllFileAndData();
+    Page<Files> findAllFileAndData(Pageable pageable);
     boolean existsByDepartmentAndFileUploaded(String department, LocalDate date);
 }

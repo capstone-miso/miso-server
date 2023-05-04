@@ -39,7 +39,7 @@ public class StoreAndPreferenceService {
     private final ModelMapper modelMapper;
     private final StoreService storeService;
 
-    public SavePreferenceRes savePreference(Member member, Long storeId) {
+    public void savePreference(Member member, Long storeId) {
         Optional<Store> findStore = storeRepository.findById(storeId);
         Store store = findStore.orElseThrow(() -> new IllegalArgumentException("Invalid store id: " + storeId));
 
@@ -49,10 +49,9 @@ public class StoreAndPreferenceService {
                 .build();
 
         preferenceRepository.save(preference);
-        return new SavePreferenceRes("Save store in preference");
     }
 
-    public DeletePreferenceRes deletePreference(Member member, Long storeId) {
+    public void deletePreference(Member member, Long storeId) {
         Optional<Store> findStore = storeRepository.findById(storeId);
         Store store = findStore.orElseThrow(() -> new IllegalArgumentException("Invalid store id: " + storeId));
 
@@ -60,7 +59,6 @@ public class StoreAndPreferenceService {
         Preference preference = result.orElseThrow(() -> new RuntimeException("또갈집을 찾지 못했어요"));
 
         preferenceRepository.delete(preference);
-        return new DeletePreferenceRes("Delete store from preference");
     }
 
     public List<StoreShortDTO> findMyStores(Member member) {
