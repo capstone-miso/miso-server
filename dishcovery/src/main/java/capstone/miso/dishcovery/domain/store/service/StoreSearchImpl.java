@@ -14,7 +14,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -81,7 +80,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         // INFO: 위치 정보로 조건 및 정렬
         if (condition.lat() != null && condition.lon() != null) {
             dtoQuery.orderBy(Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
-                    store.lat, condition.lat(), store.lon, condition.lon()).asc());
+                    store.lat, condition.lat(), store.lon, condition.lon())
+                    .asc());
         }
         // MEMO: Order 조건 추가 가능
         if (pageable != null) {
@@ -117,13 +117,14 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             expressionMap.put("sector", store.sector.containsIgnoreCase(condition.sector()));
         }
         if (condition.lat() != null) {
-            expressionMap.put("lat", store.lat.between(condition.lat() - KM, condition.lat() + KM));
+            expressionMap.put("lat", store.lat.between(condition.lat() - KM * condition.multi(), condition.lat() + KM * condition.multi()));
         }
         if (condition.lon() != null) {
-            expressionMap.put("lon", store.lon.between(condition.lon() - KM, condition.lat() + KM));
+            expressionMap.put("lon", store.lon.between(condition.lon() - KM * condition.multi(), condition.lat() + KM * condition.multi()));
         }
         return expressionMap;
     }
+
     private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
         List<OrderSpecifier<?>> orderSpecifiers = pageable.getSort().stream()
                 .map(order -> {
@@ -142,7 +143,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                     } else if (order.getProperty().equalsIgnoreCase("updatedAt")) {
                         return order.isDescending() ? store.updatedAt.desc() : store.updatedAt.asc();
                     } else {
-                        return null;
+                        throw new IllegalArgumentException("Not Support Sort Method");
                     }
                 })
                 .filter(Objects::nonNull)

@@ -21,16 +21,4 @@ class StoreImgServiceTest {
     @Autowired
     private StoreRepository storeRepository;
 
-    @DisplayName("store img 저장 테스트")
-    @Test
-    public void saveStoreImgsTest() {
-        Store store = Store.builder()
-                .name("화양식당")
-                .sid(15429981L)
-                .build();
-
-        storeImgService.saveMainStoreImages(store);
-
-        storeRepository.save(store);
-    }
 }

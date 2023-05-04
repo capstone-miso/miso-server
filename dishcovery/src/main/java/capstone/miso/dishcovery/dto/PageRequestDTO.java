@@ -35,6 +35,8 @@ public class PageRequestDTO {
     private String sector;
     private Double lat;
     private Double lon;
+    @Builder.Default
+    private Double multi = 1.0d;
     private List<String> sort;
 
     public Pageable getPageable(String... defaultProps) {

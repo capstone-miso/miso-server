@@ -29,11 +29,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
-
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
         StoreSearchCondition condition = new StoreSearchCondition(pageRequestDTO.getStoreId(), pageRequestDTO.getStoreName(),
-                pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector(), pageRequestDTO.getLat(), pageRequestDTO.getLon());
+                pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector(), pageRequestDTO.getLat(), pageRequestDTO.getLon(),
+                pageRequestDTO.getMulti());
         Pageable pageable = pageRequestDTO.getPageable("sid.desc");
 
         Page<StoreShortDTO> result = storeRepository.searchAllStoreShort(condition, pageable);

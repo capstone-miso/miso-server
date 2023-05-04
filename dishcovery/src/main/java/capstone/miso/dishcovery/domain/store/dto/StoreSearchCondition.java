@@ -13,12 +13,13 @@ public record StoreSearchCondition(
         String keyword,
         String sector,
         Double lat,
-        Double lon
+        Double lon,
+        Double multi
 ) {
     public StoreSearchCondition(Long storeId) {
-        this(storeId, null, null, null, null, null, null);
+        this(storeId, null, null, null, null, null, null, null);
     }
     public StoreSearchCondition(String storeName){
-        this(null, storeName, null, null, null, null, null);
+        this(null, storeName, null, null, null, null, null, 1.0);
     }
 }

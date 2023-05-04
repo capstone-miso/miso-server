@@ -57,7 +57,7 @@ public class StoreAndPreferenceService {
         return new DeletePreferenceRes("Delete store from preference");
     }
 
-    public List<StoreShortDTO> findMyStores(Member member, Double lat, Double lon) {
+    public List<StoreShortDTO> findMyStores(Member member) {
         List<StoreShortDTO> stores = new ArrayList<>();
 
         List<Preference> preferences = preferenceRepository.findByMemberOrderByUpdatedAtDesc(member);

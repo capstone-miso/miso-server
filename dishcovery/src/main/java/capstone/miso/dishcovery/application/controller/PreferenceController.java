@@ -29,7 +29,6 @@ import java.util.List;
 @Tag(name = "또갈집(찜)", description = "관심매장 Controller")
 public class PreferenceController {
     private final StoreAndPreferenceService storeAndPreferenceService;
-    private final PreferenceService preferenceService;
     @PostMapping(value = "/save")
     @Operation(summary = "또갈집 등록")
     public SavePreferenceRes savePreference(@RequestBody SavePreferenceReq savePreferenceReq,
@@ -44,9 +43,7 @@ public class PreferenceController {
     }
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @Operation(summary = "My 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
-    public List<StoreShortDTO> findMyStores(@RequestParam Double lat,
-                                            @RequestParam Double lon,
-                                            @AuthenticationPrincipal MemberSecurityDTO member){
-        return storeAndPreferenceService.findMyStores(member.getMember(), lat, lon);
+    public List<StoreShortDTO> findMyStores(@AuthenticationPrincipal MemberSecurityDTO member){
+        return storeAndPreferenceService.findMyStores(member.getMember());
     }
 }
