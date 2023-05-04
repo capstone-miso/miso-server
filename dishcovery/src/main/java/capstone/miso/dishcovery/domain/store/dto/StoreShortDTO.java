@@ -1,7 +1,5 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
-import capstone.miso.dishcovery.domain.storeimg.dto.StoreImgDTO;
-
 /**
  * author        : duckbill413
  * date          : 2023-04-27
@@ -26,5 +24,5 @@ public class StoreShortDTO {
         private String category;
         private List<String> keywords;
         private String sector;
-        private String mainImageUrl;
+        private String mainImage;
 }

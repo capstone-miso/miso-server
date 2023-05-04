@@ -6,7 +6,7 @@ import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
-import capstone.miso.dishcovery.domain.storeimg.StoreImg;
+import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -73,11 +72,11 @@ public class StoreServiceImpl implements StoreService {
         store.getStoreOffInfos().forEach(storeOffInfo -> offInfo.add(storeOffInfo.getInfo()));
         store.getKeywords().forEach(keyword -> keywords.add(keyword.getKeywordKeys()));
         store.getMenus().forEach(menu -> menus.add(new MenuDTO(menu.getMid(), menu.getName(), menu.getCost(), menu.getCost(), menu.getMenuImg())));
-        List<StoreImg> storeImages= store.getStoreImgs();
-        String mainImgUrl="";
-        for (StoreImg storeImage : storeImages) {
+        List<Image> storeImages= store.getImages();
+        String mainImage="";
+        for (Image storeImage : storeImages) {
             if (storeImage.getPhotoId().equals("M")){
-                mainImgUrl=storeImage.getImageUrl();
+                mainImage=storeImage.getImageUrl();
             }
             images.add(storeImage.getImageUrl());
         }
@@ -86,7 +85,7 @@ public class StoreServiceImpl implements StoreService {
         storeDetailDTO.setOffInfo(offInfo);
         storeDetailDTO.setKeywords(keywords);
         storeDetailDTO.setMenus(menus);
-        storeDetailDTO.setMainImageUrl(mainImgUrl);
+        storeDetailDTO.setMainImage(mainImage);
         storeDetailDTO.setImages(images);
 
         return storeDetailDTO;

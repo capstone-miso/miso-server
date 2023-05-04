@@ -8,9 +8,9 @@ package capstone.miso.dishcovery.domain.store;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.menu.Menu;
-import capstone.miso.dishcovery.domain.storeimg.StoreImg;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,7 +43,7 @@ public class Store extends BaseEntity {
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StoreImg> storeImgs = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreOffInfo> storeOffInfos = new HashSet<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,15 +59,15 @@ public class Store extends BaseEntity {
             fileData.setStore(this);
         }
     }
-    public void addStoreImg(StoreImg storeImg){
-        if (storeImg == null){
+    public void addStoreImg(Image image){
+        if (image == null){
             return;
         }
 
-        this.storeImgs.add(storeImg);
+        this.images.add(image);
 
-        if (storeImg.getStore() != this){
-            storeImg.setStore(this);
+        if (image.getStore() != this){
+            image.setStore(this);
         }
     }
 

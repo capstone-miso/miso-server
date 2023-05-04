@@ -35,7 +35,7 @@ public class StoreController {
     }
 
     @Operation(summary = "가게 자세한 정보", description = "매장의 자세한 정보 (키워드 분석 포함) 제공")
-    @GetMapping(value = "")
+    @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     public StoreDetailDTO loadStoreDetail(@RequestParam(value = "id") Long sid) {
         return storeService.getStoreDetail(sid);
     }

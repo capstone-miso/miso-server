@@ -1,11 +1,11 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.domain.image.QImage;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
-import capstone.miso.dishcovery.domain.storeimg.QStoreImg;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
@@ -44,7 +44,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
         QKeyword keyword = QKeyword.keyword;
-        QStoreImg storeImg = QStoreImg.storeImg;
+        QImage image = QImage.image;
 
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
         String imageSql = """
@@ -59,7 +59,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
                 .leftJoin(keyword).on(store.sid.eq(keyword.store.sid).and(expression.get("keyword")))
-                .leftJoin(storeImg).on(store.sid.eq(storeImg.store.sid))
+                .leftJoin(image).on(store.sid.eq(image.store.sid))
                 .where(expression.get("category"))
                 .where(expression.get("keyword"))
                 .where(expression.get("sector"))
@@ -75,7 +75,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.lon,
                         store.category,
                         store.sector,
-                        ExpressionUtils.as(subQuery, "mainImageUrl")
+                        ExpressionUtils.as(subQuery, "mainImage")
                 ));
         // INFO: 위치 정보로 조건 및 정렬
         if (condition.lat() != null && condition.lon() != null) {
