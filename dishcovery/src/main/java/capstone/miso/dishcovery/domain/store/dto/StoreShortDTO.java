@@ -26,5 +26,5 @@ public class StoreShortDTO {
         private String category;
         private List<String> keywords;
         private String sector;
-        private String imageUrl;
+        private String mainImageUrl;
 }

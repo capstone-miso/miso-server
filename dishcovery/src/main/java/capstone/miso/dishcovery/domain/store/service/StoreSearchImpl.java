@@ -76,7 +76,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.lon,
                         store.category,
                         store.sector,
-                        ExpressionUtils.as(subQuery, "imageUrl")
+                        ExpressionUtils.as(subQuery, "mainImageUrl")
                 ));
         // INFO: 위치 정보로 조건 및 정렬
         if (condition.lat() != null && condition.lon() != null) {
