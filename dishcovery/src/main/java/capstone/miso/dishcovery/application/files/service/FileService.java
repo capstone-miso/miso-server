@@ -5,17 +5,14 @@ import capstone.miso.dishcovery.application.files.Files;
 import capstone.miso.dishcovery.application.files.convertor.EXCELToFileConvertor;
 import capstone.miso.dishcovery.application.files.convertor.PDFToFileConvertor;
 import capstone.miso.dishcovery.application.files.download.DownloadFileComponent;
+import capstone.miso.dishcovery.application.files.dto.FileDTO;
+import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
 import capstone.miso.dishcovery.application.files.repository.FileDataRepository;
 import capstone.miso.dishcovery.application.files.repository.FileRepository;
 import capstone.miso.dishcovery.application.files.search.GwangjinFileComponent;
-import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
-import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -153,11 +150,10 @@ public class FileService {
         fileRepository.saveAll(files);
     }
 
-    public List<FileDTO> getFileAndFileData(int page) {
-        Pageable pageable = PageRequest.of(page, 30);
-        Page<Files> result = fileRepository.findAllFileAndData(pageable);
+    public List<FileDTO> getFileAndFileData() {
+        List<Files> result = fileRepository.findAllFileAndData();
         List<FileDTO> fileDTOS = new ArrayList<>();
-        for (Files file : result.getContent()) {
+        for (Files file : result) {
             List<FileDataDTO> fileDataDTOS = new ArrayList<>();
             file.getFileDataList().forEach(f -> {
                 FileDataDTO tmp = new FileDataDTO(f.getFid(), f.getDate(), f.getTime(), f.getStoreName(), f.getStoreAddress(), f.getParticipants(), f.getCost());

@@ -25,6 +25,6 @@ public interface FileRepository extends JpaRepository<Files, Long> {
     @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList WHERE f.converted=false")
     Optional<List<Files>> findFailedConvertedWithFileData();
     @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList")
-    Page<Files> findAllFileAndData(Pageable pageable);
+    List<Files> findAllFileAndData();
     boolean existsByDepartmentAndFileUploaded(String department, LocalDate date);
 }
