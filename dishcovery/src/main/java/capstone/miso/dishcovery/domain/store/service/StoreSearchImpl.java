@@ -48,11 +48,11 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
         String imageSql = """
-                (SELECT si.imageUrl
-                FROM StoreImg si
-                WHERE si.store.sid = {0}
-                    AND (si.photoId = 'M' OR NOT EXISTS (SELECT esi.imageUrl FROM StoreImg esi WHERE esi.store.sid = {0} AND esi.photoId = 'M'))
-                ORDER BY si.sid ASC
+                (SELECT i.imageUrl
+                FROM Image i
+                WHERE i.store.sid = {0}
+                    AND (i.photoId = 'M' OR NOT EXISTS (SELECT ei.imageUrl FROM Image ei WHERE ei.store.sid = {0} AND ei.photoId = 'M'))
+                ORDER BY i.sid ASC
                 LIMIT 1)
                 """;
         Expression<String> subQuery = Expressions.stringTemplate(imageSql, store.sid);
@@ -69,7 +69,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .where(expression.get("lon"))
                 .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector)
                 .select(Projections.fields(StoreShortDTO.class,
-                        store.sid,
+                        store.sid.as("id"),
                         store.name.as("storeName"),
                         store.lat,
                         store.lon,
@@ -155,7 +155,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         QKeyword keyword = QKeyword.keyword;
         JPQLQuery<String> dtoQuery = from(keyword)
                 .select(keyword.keywordKeys)
-                .where(keyword.store.sid.eq(storeShortDTO.getSid()))
+                .where(keyword.store.sid.eq(storeShortDTO.getId()))
                 .groupBy(keyword.keywordKeys);
 
         storeShortDTO.setKeywords(dtoQuery.fetch());

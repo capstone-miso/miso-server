@@ -5,6 +5,7 @@ package capstone.miso.dishcovery.domain.store.dto;
  * date          : 2023-04-27
  * description   :
  **/
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -16,13 +17,24 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Schema(description = "간단한 가게 정보 응답 DTO")
 public class StoreShortDTO {
-        private Long sid;
+        @Schema(description = "가게 ID")
+        private Long id;
+        @Schema(description = "가게 이름")
         private String storeName;
+        @Schema(description = "위도")
         private Double lat;
+        @Schema(description = "경도")
         private Double lon;
+        @Schema(description = "가게 카테고리")
         private String category;
+        @Schema(description = "가게 키워드")
         private List<String> keywords;
+        @Schema(description = "가게 구역")
         private String sector;
+        @Schema(description = "가게 메인 이미지")
         private String mainImage;
+        @Schema(description = "나의 가게 선호 여부", defaultValue = "false")
+        private boolean preference;
 }

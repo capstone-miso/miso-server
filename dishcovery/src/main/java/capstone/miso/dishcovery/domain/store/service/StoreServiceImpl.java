@@ -1,12 +1,15 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.domain.image.Image;
+import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import capstone.miso.dishcovery.domain.store.Store;
+import capstone.miso.dishcovery.domain.store.StoreOffInfo;
+import capstone.miso.dishcovery.domain.store.StoreOnInfo;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
-import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
+
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
         StoreSearchCondition condition = new StoreSearchCondition(pageRequestDTO.getStoreId(), pageRequestDTO.getStoreName(),
@@ -52,8 +55,8 @@ public class StoreServiceImpl implements StoreService {
         Optional<Store> result = storeRepository.findById(sid);
         Store store = result.orElseThrow(RuntimeException::new);
         StoreDetailDTO storeDetailDTO = StoreDetailDTO.builder()
-                .sid(store.getSid())
-                .name(store.getName())
+                .id(store.getSid())
+                .storeName(store.getName())
                 .lat(store.getLat())
                 .lon(store.getLon())
                 .phone(store.getPhone())
@@ -62,24 +65,14 @@ public class StoreServiceImpl implements StoreService {
                 .sector(store.getSector())
                 .build();
 
-        List<String> onInfo = new ArrayList<>();
-        List<String> offInfo = new ArrayList<>();
-        List<String> keywords = new ArrayList<>();
-        List<MenuDTO> menus = new ArrayList<>();
-        List<String> images=new ArrayList<>();
-
-        store.getStoreOnInfos().forEach(storeOnInfo -> onInfo.add(storeOnInfo.getInfo()));
-        store.getStoreOffInfos().forEach(storeOffInfo -> offInfo.add(storeOffInfo.getInfo()));
-        store.getKeywords().forEach(keyword -> keywords.add(keyword.getKeywordKeys()));
-        store.getMenus().forEach(menu -> menus.add(new MenuDTO(menu.getMid(), menu.getName(), menu.getCost(), menu.getCost(), menu.getMenuImg())));
-        List<Image> storeImages= store.getImages();
-        String mainImage="";
-        for (Image storeImage : storeImages) {
-            if (storeImage.getPhotoId().equals("M")){
-                mainImage=storeImage.getImageUrl();
-            }
-            images.add(storeImage.getImageUrl());
-        }
+        List<String> onInfo = store.getStoreOnInfos().stream().map(StoreOnInfo::getInfo).toList();
+        List<String> offInfo = store.getStoreOffInfos().stream().map(StoreOffInfo::getInfo).toList();
+        List<String> keywords = store.getKeywords().stream().map(Keyword::getKeywordKeys).toList();
+        List<MenuDTO> menus = store.getMenus().stream().map(menu -> new MenuDTO(menu.getMid(), menu.getName(), menu.getCost(), menu.getCost(), menu.getMenuImg())).toList();
+        List<String> images = store.getImages().stream().map(Image::getImageUrl).toList();
+        String mainImage = store.getImages().stream().filter(image1 -> image1.getPhotoId().equals("M")).findFirst().orElse(
+                store.getImages().stream().findFirst().orElse(new Image())
+        ).getImageUrl();
 
         storeDetailDTO.setOnInfo(onInfo);
         storeDetailDTO.setOffInfo(offInfo);
