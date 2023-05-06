@@ -2,8 +2,6 @@ package capstone.miso.dishcovery.application.service;
 
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.Preference;
-import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
-import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
@@ -11,14 +9,13 @@ import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import capstone.miso.dishcovery.domain.store.service.StoreService;
-import capstone.miso.dishcovery.domain.store.service.StoreServiceImpl;
+import capstone.miso.dishcovery.dto.PageRequestDTO;
+import capstone.miso.dishcovery.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,10 +31,10 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class StoreAndPreferenceService {
+    private final StoreService storeService;
     private final StoreRepository storeRepository;
     private final PreferenceRepository preferenceRepository;
     private final ModelMapper modelMapper;
-    private final StoreService storeService;
 
     public void savePreference(Member member, Long storeId) {
         Optional<Store> findStore = storeRepository.findById(storeId);
@@ -68,21 +65,46 @@ public class StoreAndPreferenceService {
         preferences.forEach(preference -> {
             Long storeId = preferenceRepository.findStoreIdByPreferenceKey(preference.getPid());
             Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(new StoreSearchCondition(storeId), null);
+            storeShortDTOS.getContent().forEach(storeShortDTO -> storeShortDTO.setPreference(true));
+
             stores.addAll(storeShortDTOS.getContent());
         });
         return stores;
     }
 
-    public List<StoreShortDTO> famousStore(int page, int size){
+    public List<StoreShortDTO> famousStore(int page, int size, Member member) {
         PageRequest pageRequest = PageRequest.of(page, size);
         var result = preferenceRepository.findFamousStores(pageRequest);
-        List<StoreShortDTO> famousStores=new ArrayList<>();
+
+        List<StoreShortDTO> famousStores = new ArrayList<>();
         for (Long sid : result) {
-            StoreDetailDTO store =storeService.getStoreDetail(sid);
-            StoreShortDTO shortDTO = modelMapper.map(store, StoreShortDTO.class);
-            shortDTO.setStoreName(store.getName());
-            famousStores.add(shortDTO);
+            StoreDetailDTO store = storeService.getStoreDetail(sid);
+            StoreShortDTO storeShortDTO = modelMapper.map(store, StoreShortDTO.class);
+            storeShortDTO.setPreference(checkMyStorePreference(member, sid));
+
+            if (storeShortDTO.isPreference())
+                continue;
+            famousStores.add(storeShortDTO);
         }
         return famousStores;
+    }
+
+    public PageResponseDTO<StoreShortDTO> listWithStoreShortWithPreference(PageRequestDTO pageRequestDTO, Member member) {
+        PageResponseDTO<StoreShortDTO> result = storeService.listWithStoreShort(pageRequestDTO);
+        result.getDtoList().forEach(storeShortDTO -> storeShortDTO.setPreference(checkMyStorePreference(member, storeShortDTO.getId())));
+        return result;
+    }
+
+    public StoreDetailDTO getStoreDetailWithPreference(Long sid, Member member) {
+        StoreDetailDTO result = storeService.getStoreDetail(sid);
+        result.setPreference(checkMyStorePreference(member, sid));
+        return result;
+    }
+
+    private boolean checkMyStorePreference(Member member, Long storeId) {
+        List<Long> result = preferenceRepository.checkMyStorePreference(member, storeId, PageRequest.of(0, 1));
+        if (result.size() > 0)
+            return true;
+        return false;
     }
 }

@@ -56,7 +56,8 @@ public class PreferenceController {
     @Operation(summary = "많이 또갈집", description = "다른 사람들이 많이 저장한 또갈집 리스트")
     @PreAuthorize("isAuthenticated()")
     public  List<StoreShortDTO> famousStores(@RequestParam(value = "page",required = false, defaultValue = "0") int page,
-                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size){
-        return storeAndPreferenceService.famousStore(page, size);
+                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                             @AuthenticationPrincipal MemberSecurityDTO member){
+        return storeAndPreferenceService.famousStore(page, size, member.getMember());
     }
 }
