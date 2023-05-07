@@ -9,13 +9,11 @@ import capstone.miso.dishcovery.dto.PageResponseDTO;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * author        : duckbill413
@@ -33,7 +31,7 @@ public class StoreController {
     @Operation(summary = "가게 간략한 정보", description = "매장 리스트에 올라가는 간단한 매장 리스트 정보")
     @GetMapping(value = "/list", produces = "application/json;charset=UTF-8")
     @PreAuthorize("permitAll()")
-    public PageResponseDTO<StoreShortDTO> loadStoreShort(PageRequestDTO pageRequestDTO,
+    public PageResponseDTO<StoreShortDTO> loadStoreShort(@Valid PageRequestDTO pageRequestDTO,
                                                          @AuthenticationPrincipal MemberSecurityDTO member) {
         pageRequestDTO = pageRequestDTO == null ? new PageRequestDTO() : pageRequestDTO;
 
@@ -43,9 +41,9 @@ public class StoreController {
     }
 
     @Operation(summary = "가게 자세한 정보", description = "매장의 자세한 정보 (키워드 분석 포함) 제공")
-    @GetMapping(value = "", produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/{id}", produces = "application/json;charset=UTF-8")
     @PreAuthorize("permitAll()")
-    public StoreDetailDTO loadStoreDetail(@RequestParam(value = "id") Long sid,
+    public StoreDetailDTO loadStoreDetail(@PathVariable(value = "id") Long sid,
                                           @AuthenticationPrincipal MemberSecurityDTO member) {
         if (member == null)
             return storeService.getStoreDetail(sid);

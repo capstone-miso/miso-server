@@ -38,7 +38,7 @@ public class StoreServiceImpl implements StoreService {
         StoreSearchCondition condition = new StoreSearchCondition(pageRequestDTO.getStoreId(), pageRequestDTO.getStoreName(),
                 pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector(), pageRequestDTO.getLat(), pageRequestDTO.getLon(),
                 pageRequestDTO.getMulti());
-        Pageable pageable = pageRequestDTO.getPageable("sid.desc");
+        Pageable pageable = pageRequestDTO.getPageable("updatedAt.desc");
 
         Page<StoreShortDTO> result = storeRepository.searchAllStoreShort(condition, pageable);
 

@@ -5,6 +5,7 @@ import capstone.miso.dishcovery.application.files.Files;
 import lombok.extern.log4j.Log4j2;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -23,6 +24,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class PDFToFileConvertor implements FileConvertor {
+    @Value("${gong.file.path}")
+    private String path;
     private final int CASE_OPTION_CNT = 13;
 
     private List<FileData> parsingString(String source, Files file) {
@@ -510,7 +513,6 @@ public class PDFToFileConvertor implements FileConvertor {
     }
     @Override
     public List<FileData> parseFileToFileData(Files file) {
-        String path = "D:\\downloads\\";
         String fileName = file.getFileName();
         String src = path + fileName;
         try (PDDocument document = PDDocument.load(new File(src))) {

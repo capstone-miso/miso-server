@@ -40,12 +40,7 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
         // Refresh token
         String refreshToken = jwtUtil.generateToken(claim, 30);
 
-        Gson gson = new Gson();
-        Map<String, String> keyMap = Map.of("accessToken", accessToken,
-                "refreshToken", refreshToken);
-
-        String jsonStr = gson.toJson(keyMap);
-
-        response.getWriter().println(jsonStr);
+        response.setHeader("Authorization", "Bearer " + accessToken);
+        response.setHeader("Refresh-Token", refreshToken);
     }
 }

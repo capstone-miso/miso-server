@@ -1,11 +1,8 @@
 package capstone.miso.dishcovery.application.controller;
 
 import capstone.miso.dishcovery.application.service.StoreAndPreferenceService;
-import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceReq;
 import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
-import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceReq;
 import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
-import capstone.miso.dishcovery.domain.preference.service.PreferenceService;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,20 +26,20 @@ import java.util.List;
 @Tag(name = "또갈집(찜)", description = "관심매장 Controller")
 public class PreferenceController {
     private final StoreAndPreferenceService storeAndPreferenceService;
-    @PostMapping(value = "/save")
+    @PostMapping(value = "/save/{storeId}")
     @Operation(summary = "또갈집 등록")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<SavePreferenceRes> savePreference(@RequestBody SavePreferenceReq savePreferenceReq,
+    public ResponseEntity<SavePreferenceRes> savePreference(@PathVariable(value = "storeId") Long storeId,
                                                            @AuthenticationPrincipal MemberSecurityDTO member) {
-        storeAndPreferenceService.savePreference(member.getMember(), savePreferenceReq.storeId());
+        storeAndPreferenceService.savePreference(member.getMember(), storeId);
         return ResponseEntity.status(201).body(new SavePreferenceRes("또갈집 등록 성공!"));
     }
-    @DeleteMapping(value = "/delete")
+    @DeleteMapping(value = "/delete/{storeId}")
     @Operation(summary = "또갈집 목록에서 삭제")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<DeletePreferenceRes> savePreference(@RequestBody DeletePreferenceReq deletePreferenceReq,
+    public ResponseEntity<DeletePreferenceRes> deletePreference(@PathVariable(value = "storeId") Long storeId,
                                               @AuthenticationPrincipal MemberSecurityDTO member) {
-        storeAndPreferenceService.deletePreference(member.getMember(), deletePreferenceReq.storeId());
+        storeAndPreferenceService.deletePreference(member.getMember(), storeId);
         return ResponseEntity.ok(new DeletePreferenceRes("또갈집 삭제 성공!"));
     }
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")

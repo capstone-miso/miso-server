@@ -1,6 +1,7 @@
 package capstone.miso.dishcovery.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,6 +29,7 @@ import java.util.List;
 public class PageRequestDTO {
     @Schema(description = "페이지 번호", defaultValue = "1", nullable = true)
     @Builder.Default
+    @Min(value = 1L, message = "페이지 번호는 1 이상이여야 합니다.")
     private int page = 1;
     @Schema(description = "페이지 크기", defaultValue = "10", nullable = true)
     @Builder.Default
@@ -42,9 +44,9 @@ public class PageRequestDTO {
     private String keyword;
     @Schema(description = "관할 구역 검색", nullable = true, allowableValues = {"광진구"})
     private String sector;
-    @Schema(description = "위도 검색 경도와 세트")
+    @Schema(description = "위도 검색 경도와 세트", nullable = true)
     private Double lat;
-    @Schema(description = "경도 검색 위도와 세트")
+    @Schema(description = "경도 검색 위도와 세트", nullable = true)
     private Double lon;
     @Schema(description = "검색 범위 설정 (1km * multi로 검색 범위 설정 가능)", nullable = true, defaultValue = "1.0", example = "1.0")
     @Builder.Default
