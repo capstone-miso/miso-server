@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.application.files.download;
 
 import capstone.miso.dishcovery.application.files.Files;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -18,6 +19,8 @@ import java.util.UUID;
 @Log4j2
 @Component
 public class DownloadFileComponent {
+    @Value("${gong.file.path}")
+    private String path;
     private final static int BUFFER_SIZE = 4096;
 
     public Files downloadFile(Files files) {
@@ -60,7 +63,7 @@ public class DownloadFileComponent {
                 }
 
                 InputStream is = conn.getInputStream();
-                String outputDir = "D:/downloads";
+                String outputDir = path;
                 FileOutputStream fos = new FileOutputStream(new File(outputDir, fileName));
 
                 int bytesRead;

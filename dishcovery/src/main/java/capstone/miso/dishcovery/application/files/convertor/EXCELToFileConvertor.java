@@ -4,6 +4,7 @@ import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.application.files.Files;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
@@ -18,6 +19,8 @@ import java.util.*;
  **/
 @Component
 public class EXCELToFileConvertor implements FileConvertor {
+    @Value("${gong.file.path}")
+    private String path;
     private final static String[] date = {"일자", "집행일"};
     private final static String[] time = {"시간", "시각"};
     private final static String[] storeName = {"장소"};
@@ -29,7 +32,6 @@ public class EXCELToFileConvertor implements FileConvertor {
     private final static String[] expenditure = {"비목"};
     @Override
     public List<FileData> parseFileToFileData(Files file) {
-        String path = "D:\\downloads\\";
         String testFileName = file.getFileName();
         String src = path + testFileName;
 

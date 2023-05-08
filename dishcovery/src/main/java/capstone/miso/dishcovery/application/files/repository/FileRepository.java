@@ -1,6 +1,8 @@
 package capstone.miso.dishcovery.application.files.repository;
 
 import capstone.miso.dishcovery.application.files.Files;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

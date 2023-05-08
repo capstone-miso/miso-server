@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
+
 /**
  * author        : duckbill413
  * date          : 2023-04-26
@@ -33,7 +35,12 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
+
         if (!path.equalsIgnoreCase("/refreshToken")){
+            filterChain.doFilter(request, response);
+            return;
+        } else if (request.getMethod().equalsIgnoreCase("GET")) {
+            response.getWriter().println("GET Method not support");
             filterChain.doFilter(request, response);
             return;
         }
@@ -81,9 +88,6 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         }
 
         this.sendTokens(accessTokenValue, refreshTokenValue, response);
-
-//        response.addHeader("accessToken", accessTokenValue);
-//        response.addHeader("refreshToken", refreshTokenValue);
     }
     private Map<String, String> parseRequestJSON(HttpServletRequest request){
         try(Reader reader = new InputStreamReader(request.getInputStream())){
@@ -113,17 +117,7 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
         }
     }
     private void sendTokens(String accessTokenValue, String refreshTokenValue, HttpServletResponse response){
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-        Gson gson = new Gson();
-        String jsonStr = gson.toJson(Map.of(
-                "accessToken", accessTokenValue,
-                "refreshToken", refreshTokenValue
-        ));
-        try {
-            response.getWriter().println(gson.toJson(jsonStr));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        response.setHeader("Authorization", "Bearer " + accessTokenValue);
+        response.setHeader("Refresh-Token", refreshTokenValue);
     }
 }

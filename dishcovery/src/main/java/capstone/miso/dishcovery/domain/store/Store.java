@@ -8,13 +8,13 @@ package capstone.miso.dishcovery.domain.store;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.image.Image;
+import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.menu.Menu;
-import capstone.miso.dishcovery.domain.storeimg.StoreImg;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @Setter
@@ -34,13 +34,20 @@ public class Store extends BaseEntity {
     private String category;
     private String sector;
     private String phone;
+    private int isExtracted;
+
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    private List<Keyword> keywords = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<FileData> fileDataList = new ArrayList<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
-    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StoreImg> storeImgs = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StoreOffInfo> storeOffInfos = new HashSet<>();
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<StoreOnInfo> storeOnInfos = new HashSet<>();
 
     public void addFileData(FileData fileData){
         if (fileData == null){
@@ -52,15 +59,15 @@ public class Store extends BaseEntity {
             fileData.setStore(this);
         }
     }
-    public void addStoreImg(StoreImg storeImg){
-        if (storeImg == null){
+    public void addStoreImg(Image image){
+        if (image == null){
             return;
         }
 
-        this.storeImgs.add(storeImg);
+        this.images.add(image);
 
-        if (storeImg.getStore() != this){
-            storeImg.setStore(this);
+        if (image.getStore() != this){
+            image.setStore(this);
         }
     }
 

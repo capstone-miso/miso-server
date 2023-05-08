@@ -43,7 +43,6 @@ public class JWTUtil {
                 .signWith(SignatureAlgorithm.HS256, jwtKey.getBytes())
                 .compact();
 
-        log.info("generated JWT KEY: " + jwtStr);
         return jwtStr;
     }
 

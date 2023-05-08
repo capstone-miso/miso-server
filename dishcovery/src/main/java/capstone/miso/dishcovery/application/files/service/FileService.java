@@ -5,11 +5,11 @@ import capstone.miso.dishcovery.application.files.Files;
 import capstone.miso.dishcovery.application.files.convertor.EXCELToFileConvertor;
 import capstone.miso.dishcovery.application.files.convertor.PDFToFileConvertor;
 import capstone.miso.dishcovery.application.files.download.DownloadFileComponent;
+import capstone.miso.dishcovery.application.files.dto.FileDTO;
+import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
 import capstone.miso.dishcovery.application.files.repository.FileDataRepository;
 import capstone.miso.dishcovery.application.files.repository.FileRepository;
 import capstone.miso.dishcovery.application.files.search.GwangjinFileComponent;
-import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
-import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
@@ -152,7 +152,6 @@ public class FileService {
 
     public List<FileDTO> getFileAndFileData() {
         List<Files> result = fileRepository.findAllFileAndData();
-
         List<FileDTO> fileDTOS = new ArrayList<>();
         for (Files file : result) {
             List<FileDataDTO> fileDataDTOS = new ArrayList<>();

@@ -1,12 +1,10 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
-import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.stereotype.Service;
 
 /**
  * author        : duckbill413
@@ -15,4 +13,5 @@ import org.springframework.stereotype.Service;
  **/
 public interface StoreService {
     PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO);
+    StoreDetailDTO getStoreDetail(Long sid);
 }

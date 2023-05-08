@@ -1,4 +1,4 @@
-package capstone.miso.dishcovery.domain.storeimg.dto;
+package capstone.miso.dishcovery.domain.image.dto;
 
 import jakarta.validation.Valid;
 import lombok.Getter;
