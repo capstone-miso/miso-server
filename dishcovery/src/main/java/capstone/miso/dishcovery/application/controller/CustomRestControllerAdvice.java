@@ -5,6 +5,8 @@ import capstone.miso.dishcovery.application.exception.dto.ExceptionHandlerDTO;
 import capstone.miso.dishcovery.application.exception.dto.ValidationExceptionHandlerDTO;
 import capstone.miso.dishcovery.domain.member.exception.MemberValidationException;
 import lombok.extern.log4j.Log4j2;
+import org.apache.coyote.Response;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -27,7 +29,7 @@ public class CustomRestControllerAdvice {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ExceptionHandlerDTO> handleAccessDeniedException(AccessDeniedException e) {
 
-        return ResponseEntity.status(401).body(new ExceptionHandlerDTO(e.getLocalizedMessage(), "인증되지 않은 유저 입니다."));
+        return ResponseEntity.status(401).body(new ExceptionHandlerDTO("인증되지 않은 유저 입니다."));
     }
 
     @ExceptionHandler(MemberValidationException.class)
@@ -38,14 +40,16 @@ public class CustomRestControllerAdvice {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ExceptionHandlerDTO> handleIllegalArgumentException(IllegalArgumentException e) {
-        return ResponseEntity.badRequest().body(new ExceptionHandlerDTO(e.getLocalizedMessage(), e.getMessage()));
+    @ExceptionHandler({IllegalArgumentException.class, InvalidDataAccessApiUsageException.class})
+    public ResponseEntity<ExceptionHandlerDTO> handleIllegalArgumentAndInvalidDataAccessException(Exception e) {
+        return ResponseEntity.badRequest().body(new ExceptionHandlerDTO(e.getMessage()));
     }
+
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ExceptionHandlerDTO> handleRuntimeException(RuntimeException e) {
-        return ResponseEntity.unprocessableEntity().body(new ExceptionHandlerDTO(e.getLocalizedMessage(), e.getMessage()));
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body(new ExceptionHandlerDTO(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -62,6 +66,7 @@ public class CustomRestControllerAdvice {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionHandlerDTO> handlerAllException(Exception e) {
-        return ResponseEntity.badRequest().body(new ExceptionHandlerDTO(e.getLocalizedMessage(), e.getMessage()));
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body(new ExceptionHandlerDTO(e.getMessage()));
     }
 }

@@ -6,7 +6,6 @@ package capstone.miso.dishcovery.application.exception.dto;
  * description   :
  **/
 
-public record ExceptionHandlerDTO(String localizedMessage,
-                                  String message
+public record ExceptionHandlerDTO(String message
 ) {
 }

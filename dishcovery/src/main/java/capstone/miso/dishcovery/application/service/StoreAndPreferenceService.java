@@ -58,11 +58,12 @@ public class StoreAndPreferenceService {
         preferenceRepository.delete(preference);
     }
 
-    public List<StoreShortDTO> findMyStores(Member member) {
+    public List<StoreShortDTO> findMyStores(Member member, int page, int size) {
         List<StoreShortDTO> stores = new ArrayList<>();
 
-        List<Preference> preferences = preferenceRepository.findByMemberOrderByUpdatedAtDesc(member);
-        preferences.forEach(preference -> {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<Preference> preferences = preferenceRepository.findByMemberOrderByUpdatedAtDesc(member, pageRequest);
+        preferences.getContent().forEach(preference -> {
             Long storeId = preferenceRepository.findStoreIdByPreferenceKey(preference.getPid());
             Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(new StoreSearchCondition(storeId), null);
             storeShortDTOS.getContent().forEach(storeShortDTO -> storeShortDTO.setPreference(true));

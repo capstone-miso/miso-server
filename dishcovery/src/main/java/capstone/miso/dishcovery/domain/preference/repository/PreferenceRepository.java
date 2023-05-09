@@ -26,7 +26,7 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long> {
             "FROM Preference p " +
             "WHERE p.member = :member " +
             "GROUP BY p.store")
-    List<Preference> findByMemberOrderByUpdatedAtDesc(@Param("member") Member member);
+    Page<Preference> findByMemberOrderByUpdatedAtDesc(@Param("member") Member member, Pageable pageable);
     Optional<Preference> findByMemberAndStore(Member member, Store store);
     @Query("SELECT p.store.sid FROM Preference p WHERE p.pid = :pid")
     Long findStoreIdByPreferenceKey(@Param("pid") Long pid);

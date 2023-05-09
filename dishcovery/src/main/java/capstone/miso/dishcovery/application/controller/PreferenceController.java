@@ -45,8 +45,10 @@ public class PreferenceController {
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @Operation(summary = "My 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public List<StoreShortDTO> findMyStores(@AuthenticationPrincipal MemberSecurityDTO member){
-        return storeAndPreferenceService.findMyStores(member.getMember());
+    public List<StoreShortDTO> findMyStores(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
+                                            @RequestParam(value = "size", defaultValue = "10", required = false) int size,
+                                            @AuthenticationPrincipal MemberSecurityDTO member){
+        return storeAndPreferenceService.findMyStores(member.getMember(), page, size);
     }
 
     @GetMapping("/famous")

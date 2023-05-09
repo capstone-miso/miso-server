@@ -6,7 +6,6 @@ import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.OrderSpecifier;
@@ -14,8 +13,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -83,7 +80,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         // INFO: 위치 정보로 조건 및 정렬
         if (condition.lat() != null && condition.lon() != null) {
             dtoQuery.orderBy(Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
-                    store.lat, condition.lat(), store.lon, condition.lon())
+                            store.lat, condition.lat(), store.lon, condition.lon())
                     .asc());
         }
         // MEMO: Order 조건 추가 가능
@@ -96,10 +93,10 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         } else {
             pageable = PageRequest.of(0, 10);
         }
-        QueryResults<StoreShortDTO> result = dtoQuery.fetchResults();
-        List<StoreShortDTO> dtoList = result.getResults();
+
+        List<StoreShortDTO> dtoList = dtoQuery.fetch();
+        long count = dtoQuery.fetchCount();
         dtoList.forEach(this::addKeywordList);
-        long count = result.getTotal();
         return new PageImpl<>(dtoList, pageable, count);
     }
 
