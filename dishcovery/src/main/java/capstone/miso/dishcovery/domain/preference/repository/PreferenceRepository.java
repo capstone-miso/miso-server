@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -22,11 +21,12 @@ import java.util.Optional;
 
 public interface PreferenceRepository extends JpaRepository<Preference, Long> {
     List<Preference> findByMember(Member member);
-    @Query("SELECT new capstone.miso.dishcovery.domain.preference.Preference(p.pid, p.member, p.store)" +
+    @Query(value = "SELECT new capstone.miso.dishcovery.domain.preference.repository.PreferenceDAO(p.pid, p.member, p.store) " +
             "FROM Preference p " +
             "WHERE p.member = :member " +
             "GROUP BY p.store")
-    Page<Preference> findByMemberOrderByUpdatedAtDesc(@Param("member") Member member, Pageable pageable);
+    Page<PreferenceDAO> findMyPreferenceStores(@Param("member") Member member, Pageable pageable);
+
     Optional<Preference> findByMemberAndStore(Member member, Store store);
     @Query("SELECT p.store.sid FROM Preference p WHERE p.pid = :pid")
     Long findStoreIdByPreferenceKey(@Param("pid") Long pid);

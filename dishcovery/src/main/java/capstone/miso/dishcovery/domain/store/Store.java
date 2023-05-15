@@ -10,6 +10,7 @@ import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.domain.BaseEntity;
 import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
+import capstone.miso.dishcovery.domain.keyword.KeywordData;
 import capstone.miso.dishcovery.domain.menu.Menu;
 import jakarta.persistence.*;
 import lombok.*;
@@ -35,6 +36,9 @@ public class Store extends BaseEntity {
     private String sector;
     private String phone;
     private int isExtracted;
+    private int totalVisitedCount;
+    private int totalVisited;
+    private int totalCost;
 
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Keyword> keywords = new ArrayList<>();
@@ -48,7 +52,8 @@ public class Store extends BaseEntity {
     private Set<StoreOffInfo> storeOffInfos = new HashSet<>();
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreOnInfo> storeOnInfos = new HashSet<>();
-
+    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL)
+    private KeywordData keywordData;
     public void addFileData(FileData fileData){
         if (fileData == null){
             return;

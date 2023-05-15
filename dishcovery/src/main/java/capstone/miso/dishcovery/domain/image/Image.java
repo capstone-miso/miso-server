@@ -6,9 +6,12 @@ package capstone.miso.dishcovery.domain.image;
  * description   :
  **/
 import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.menu.Menu;
 import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Getter
 @Setter
@@ -16,7 +19,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@ToString(callSuper = true)
+@ToString
 @EqualsAndHashCode(callSuper = true)
 public class Image extends BaseEntity {
     @Id

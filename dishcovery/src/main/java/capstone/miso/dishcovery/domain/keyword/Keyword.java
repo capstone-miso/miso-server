@@ -10,6 +10,9 @@ import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -18,12 +21,13 @@ import lombok.*;
 @Entity
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@Table(name = "store_keyword")
 public class Keyword extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long kid;
-    private String keywordKeys;
-    private String reason;
+    @Enumerated(EnumType.STRING)
+    private KeywordSet keyword;
     @ManyToOne
     @JoinColumn(name = "store_id")
     private Store store;

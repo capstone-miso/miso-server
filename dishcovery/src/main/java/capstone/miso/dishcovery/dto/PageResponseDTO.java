@@ -23,24 +23,24 @@ public class PageResponseDTO<T> {
     @Schema(description = "한 페이지당 데이터의 수")
     private int size;
     @Schema(description = "전체 데이터의 개수")
-    private int total;
+    private final int total;
     @Schema(description = "시작 페이지 번호")
-    private int start; // 시작 페이지 번호
+    private final int start; // 시작 페이지 번호
     @Schema(description = "마지막 페이지 번호")
-    private int end; // 마지막 페이지 번호
+    private final int end; // 마지막 페이지 번호
     @Schema(description = "이전 페이지 존재 여부")
-    private boolean prev;
+    private final boolean prev;
     @Schema(description = "다음 페이지 존재 여부")
-    private boolean next;
+    private final boolean next;
     @Schema(description = "이전 페이지 주소")
     private String prevPage;
     @Schema(description = "다음 페이지 주소")
     private String nextPage;
     @ToString.Exclude
     @JsonIgnore
-    private PageRequestDTO pageRequestDTO;
+    private final PageRequestDTO pageRequestDTO;
     @Schema(description = "데이터 리스트")
-    private List<T> dtoList;
+    private final List<T> dtoList;
 
     @Builder
     public PageResponseDTO(PageRequestDTO pageRequestDTO, List<T> dtoList, int total) {

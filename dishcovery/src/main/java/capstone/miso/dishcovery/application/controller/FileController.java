@@ -2,7 +2,7 @@ package capstone.miso.dishcovery.application.controller;
 
 import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import capstone.miso.dishcovery.application.files.dto.ReqDownloadFile;
-import capstone.miso.dishcovery.application.files.service.FileService;
+import capstone.miso.dishcovery.application.files.service.KWANGJINFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "File", description = "파일 컨트롤 API")
 public class FileController {
-    private final FileService fileService;
+    private final KWANGJINFileService KWANGJINFileService;
 
     @Operation(summary = "파일 검색 및 다운로드", description = "파라미터로 page번호, 시작일, 종료일을 입력 받아 파일 검색")
     @PostMapping(value = "/download", produces = "application/json;charset=UTF-8")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void downloadFile(@RequestBody ReqDownloadFile reqDownloadFile) {
-        fileService.loadFiles(reqDownloadFile.page(), reqDownloadFile.sdate(), reqDownloadFile.edate());
-        fileService.downloadFile();
+        KWANGJINFileService.loadFiles(reqDownloadFile.page(), reqDownloadFile.sdate(), reqDownloadFile.edate());
+        KWANGJINFileService.downloadFile();
     }
 
     @Operation(summary = "파일 변환", description = "저장된 파일을 변환 fail 파라미터 값에 따라 변환 실패 파일도 변환 가능")
@@ -38,9 +38,9 @@ public class FileController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void convertFile(@RequestParam boolean fail) {
         if (fail) {
-            fileService.convertFailedFileToFileData();
+            KWANGJINFileService.convertFailedFileToFileData();
         } else {
-            fileService.convertFileToFileData();
+            KWANGJINFileService.convertFileToFileData();
         }
     }
 
@@ -48,7 +48,7 @@ public class FileController {
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<FileDTO> getFileAndFileData() {
-        List<FileDTO> result = fileService.getFileAndFileData();
+        List<FileDTO> result = KWANGJINFileService.getFileAndFileData();
         return result;
     }
 }

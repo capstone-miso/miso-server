@@ -4,9 +4,13 @@ import capstone.miso.dishcovery.application.service.StoreAndPreferenceService;
 import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
+import capstone.miso.dishcovery.dto.PageResponseDTO;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +30,7 @@ import java.util.List;
 @Tag(name = "또갈집(찜)", description = "관심매장 Controller")
 public class PreferenceController {
     private final StoreAndPreferenceService storeAndPreferenceService;
-    @PostMapping(value = "/save/{storeId}")
+    @PostMapping(value = "/{storeId}")
     @Operation(summary = "또갈집 등록")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<SavePreferenceRes> savePreference(@PathVariable(value = "storeId") Long storeId,
@@ -34,7 +38,7 @@ public class PreferenceController {
         storeAndPreferenceService.savePreference(member.getMember(), storeId);
         return ResponseEntity.status(201).body(new SavePreferenceRes("또갈집 등록 성공!"));
     }
-    @DeleteMapping(value = "/delete/{storeId}")
+    @DeleteMapping(value = "/{storeId}")
     @Operation(summary = "또갈집 목록에서 삭제")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public ResponseEntity<DeletePreferenceRes> deletePreference(@PathVariable(value = "storeId") Long storeId,
@@ -45,10 +49,22 @@ public class PreferenceController {
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @Operation(summary = "My 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public List<StoreShortDTO> findMyStores(@RequestParam(value = "page", defaultValue = "1", required = false) int page,
-                                            @RequestParam(value = "size", defaultValue = "10", required = false) int size,
-                                            @AuthenticationPrincipal MemberSecurityDTO member){
-        return storeAndPreferenceService.findMyStores(member.getMember(), page, size);
+    public PageResponseDTO<StoreShortDTO> findMyStores(@RequestParam(value = "page", defaultValue = "1", required = false) @Valid @Min(value = 1L, message = "페이지 번호는 1 이상 입니다.") int page,
+                                                       @RequestParam(value = "size", defaultValue = "10", required = false) int size,
+                                                       @AuthenticationPrincipal MemberSecurityDTO member,
+                                                       HttpServletRequest httpServletRequest){
+        PageResponseDTO<StoreShortDTO> responseDTO = storeAndPreferenceService.findMyPreferenceStores(member.getMember(), page, size);
+
+        String requestURL = httpServletRequest.getRequestURL().toString();
+        String queryString = httpServletRequest.getQueryString();
+
+        // 쿼리 파라미터가 있다면 URL에 추가
+        if (queryString != null) {
+            requestURL += "?" + queryString;
+        }
+        responseDTO.setPageLink(requestURL);
+
+        return responseDTO;
     }
 
     @GetMapping("/famous")

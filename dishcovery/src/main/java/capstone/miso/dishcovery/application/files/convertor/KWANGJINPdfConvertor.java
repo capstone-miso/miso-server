@@ -23,9 +23,10 @@ import java.util.stream.Collectors;
  **/
 @Log4j2
 @Component
-public class PDFToFileConvertor implements FileConvertor {
+public class KWANGJINPdfConvertor implements FileConvertor {
     @Value("${gong.file.path}")
     private String path;
+    private final static String KWANGJIN = "광진구";
     private final int CASE_OPTION_CNT = 13;
 
     private List<FileData> parsingString(String source, Files file) {
@@ -35,7 +36,7 @@ public class PDFToFileConvertor implements FileConvertor {
         int length = 0; // 칼럼의 개수
 
         for (String line : strLines) {
-            List<String> strings = Arrays.stream(line.split("\\*\\*")).map(s -> s.trim()).collect(Collectors.toList());
+            List<String> strings = Arrays.stream(line.split("\\*\\*")).map(String::trim).collect(Collectors.toList());
 
             // 줄의 첫번째가 숫자이면 (연번) 삭제
             if (strings.get(0).matches("\\d+")) strings.remove(0);
@@ -76,14 +77,14 @@ public class PDFToFileConvertor implements FileConvertor {
                 }
             }
             // null이 아닌 경우 추가
-            if (Objects.nonNull(fileData))
+            if (Objects.nonNull(fileData)) {
+                fileData.setRegion(file.getRegion()); // 구 정보 설정
                 fileDatas.add(fileData);
+            } ;
         }
         // 파일 변환 성공 여부 입력
-        if (DOC_PATTERN == -1)
-            file.setConverted(false);
-        else
-            file.setConverted(true);
+        if (DOC_PATTERN == -1) file.setConverted(false);
+        else file.setConverted(true);
         // 파일 변환 성공 메시지
         file.setConvertResult(convertMsg);
 
@@ -138,20 +139,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(7);
         String expenditure = null;
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case11(List<String> row, Files file) {
@@ -169,20 +157,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(9);
         String expenditure = row.get(1);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case10(List<String> row, Files file) {
@@ -200,20 +175,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(7);
         String expenditure = row.get(8);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case9(List<String> row, Files file) {
@@ -231,20 +193,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(8);
         String expenditure = row.get(9);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case8(List<String> row, Files file) {
@@ -262,20 +211,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(6);
         String expenditure = row.get(7);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case7(List<String> row, Files file) {
@@ -292,24 +228,10 @@ public class PDFToFileConvertor implements FileConvertor {
         String cost = row.get(6);
 
         String paymentOption = null;
-        if (row.size() == 8)
-            paymentOption = row.get(7);
+        if (row.size() == 8) paymentOption = row.get(7);
         String expenditure = null;
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case6(List<String> row, Files file) {
@@ -325,19 +247,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(6);
         String expenditure = row.get(7);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case5(List<String> row, Files file) {
@@ -355,20 +265,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(8);
         String expenditure = row.get(9);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
 
     private FileData case4(List<String> row, Files file) {
@@ -387,21 +284,9 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(6);
         String expenditure = row.get(7);
 
-        FileData fileData = FileData.builder()
-                .date(date)
-                .time(time)
-                .storeName(storeName)
-                .storeAddress(storeAddress)
-                .purpose(purpose)
-                .participants(participants)
-                .cost(cost)
-                .paymentOption(paymentOption)
-                .expenditure(expenditure)
-                .files(file)
-                .build();
-
-        return fileData;
+        return FileData.builder().date(date).time(time).storeName(storeName).storeAddress(storeAddress).purpose(purpose).participants(participants).cost(cost).paymentOption(paymentOption).expenditure(expenditure).files(file).build();
     }
+
     private FileData case2(List<String> row, Files file) {
         List<String> d = Arrays.stream(row.get(0).split("\\D{1,3}")).toList();
         List<String> t = Arrays.stream(row.get(1).split("\\D{1,3}")).toList();
@@ -416,7 +301,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String participants = row.get(6);
         String paymentOption = row.get(7);
 
-        FileData fileData = FileData.builder()
+        return FileData.builder()
                 .date(date)
                 .time(time)
                 .purpose(purpose)
@@ -427,8 +312,6 @@ public class PDFToFileConvertor implements FileConvertor {
                 .paymentOption(paymentOption)
                 .files(file)
                 .build();
-
-        return fileData;
     }
 
     private FileData case3(List<String> row, Files file) {
@@ -446,7 +329,7 @@ public class PDFToFileConvertor implements FileConvertor {
         String paymentOption = row.get(7);
         String expenditure = row.get(8);
 
-        FileData fileData = FileData.builder()
+        return FileData.builder()
                 .date(date)
                 .time(time)
                 .storeName(storeName)
@@ -458,8 +341,6 @@ public class PDFToFileConvertor implements FileConvertor {
                 .files(file)
                 .expenditure(expenditure)
                 .build();
-
-        return fileData;
     }
 
     private FileData case1(List<String> row, Files file) {
@@ -476,9 +357,17 @@ public class PDFToFileConvertor implements FileConvertor {
         String participants = row.get(8);
         String paymentOption = row.get(9);
 
-        FileData fileData = FileData.builder().files(file).date(date).time(time).purpose(purpose).storeName(storeName).storeAddress(storeAddress).cost(cost).participants(participants).paymentOption(paymentOption).build();
-
-        return fileData;
+        return FileData.builder()
+                .files(file)
+                .date(date)
+                .time(time)
+                .purpose(purpose)
+                .storeName(storeName)
+                .storeAddress(storeAddress)
+                .cost(cost)
+                .participants(participants).
+                paymentOption(paymentOption)
+                .build();
     }
 
     private FileData case0(List<String> row, Files file) {
@@ -499,18 +388,27 @@ public class PDFToFileConvertor implements FileConvertor {
         // 인원 수
         String participants = row.get(7);
         String paymentOption = row.get(8);
-        FileData fileData = FileData.builder().files(file).date(date).time(time).purpose(purpose).storeName(storeName).storeAddress(storeAddress).cost(cost).participants(participants).paymentOption(paymentOption).build();
 
-        return fileData;
+        return FileData.builder()
+                .files(file)
+                .date(date)
+                .time(time)
+                .purpose(purpose)
+                .storeName(storeName)
+                .storeAddress(storeAddress)
+                .cost(cost)
+                .participants(participants)
+                .paymentOption(paymentOption)
+                .build();
     }
 
     private static <E> E getLastElement(ArrayList<E> list) {
-        if ((list != null) && (list.isEmpty() == false)) {
+        if ((list != null) && (!list.isEmpty())) {
             int lastIdx = list.size() - 1;
-            E lastElement = list.get(lastIdx);
-            return lastElement;
+            return list.get(lastIdx);
         } else return null;
     }
+
     @Override
     public List<FileData> parseFileToFileData(Files file) {
         String fileName = file.getFileName();
@@ -521,10 +419,9 @@ public class PDFToFileConvertor implements FileConvertor {
             stripper.setWordSeparator("**");
             String text = stripper.getText(document);
 
-            List<FileData> result = parsingString(text, file);
-            return result;
+            return parsingString(text, file);
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
         return null;
     }

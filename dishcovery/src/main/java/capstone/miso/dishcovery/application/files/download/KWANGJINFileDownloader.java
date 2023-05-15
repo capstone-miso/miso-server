@@ -18,7 +18,7 @@ import java.util.UUID;
  **/
 @Log4j2
 @Component
-public class DownloadFileComponent {
+public class KWANGJINFileDownloader {
     @Value("${gong.file.path}")
     private String path;
     private final static int BUFFER_SIZE = 4096;

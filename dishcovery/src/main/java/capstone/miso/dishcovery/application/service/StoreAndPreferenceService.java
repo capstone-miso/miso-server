@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.application.service;
 
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.Preference;
+import capstone.miso.dishcovery.domain.preference.repository.PreferenceDAO;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
@@ -11,14 +12,17 @@ import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import capstone.miso.dishcovery.domain.store.service.StoreService;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,19 +62,31 @@ public class StoreAndPreferenceService {
         preferenceRepository.delete(preference);
     }
 
-    public List<StoreShortDTO> findMyStores(Member member, int page, int size) {
+    @Transactional
+    public PageResponseDTO<StoreShortDTO> findMyPreferenceStores(Member member, int page, int size) {
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
+                .page(page)
+                .size(size)
+                .sort(List.of("updatedAt.desc"))
+                .build();
+        
         List<StoreShortDTO> stores = new ArrayList<>();
 
-        PageRequest pageRequest = PageRequest.of(page, size);
-        Page<Preference> preferences = preferenceRepository.findByMemberOrderByUpdatedAtDesc(member, pageRequest);
+        Pageable pageRequest = pageRequestDTO.getPageable();
+        Page<PreferenceDAO> preferences = preferenceRepository.findMyPreferenceStores(member, pageRequest);
+
         preferences.getContent().forEach(preference -> {
-            Long storeId = preferenceRepository.findStoreIdByPreferenceKey(preference.getPid());
+            Long storeId = preference.getStore().getSid();
             Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(new StoreSearchCondition(storeId), null);
             storeShortDTOS.getContent().forEach(storeShortDTO -> storeShortDTO.setPreference(true));
 
             stores.addAll(storeShortDTOS.getContent());
         });
-        return stores;
+        return PageResponseDTO.<StoreShortDTO>builder()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(stores)
+                .total(preferences.getTotalPages())
+                .build();
     }
 
     public List<StoreShortDTO> famousStore(int page, int size, Member member) {

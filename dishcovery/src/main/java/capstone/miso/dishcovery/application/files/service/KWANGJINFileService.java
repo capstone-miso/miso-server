@@ -2,17 +2,15 @@ package capstone.miso.dishcovery.application.files.service;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.application.files.Files;
-import capstone.miso.dishcovery.application.files.convertor.EXCELToFileConvertor;
-import capstone.miso.dishcovery.application.files.convertor.PDFToFileConvertor;
-import capstone.miso.dishcovery.application.files.download.DownloadFileComponent;
+import capstone.miso.dishcovery.application.files.convertor.KWANGJINExcelConvertor;
+import capstone.miso.dishcovery.application.files.convertor.KWANGJINPdfConvertor;
+import capstone.miso.dishcovery.application.files.download.KWANGJINFileDownloader;
 import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import capstone.miso.dishcovery.application.files.dto.FileDataDTO;
-import capstone.miso.dishcovery.application.files.repository.FileDataRepository;
 import capstone.miso.dishcovery.application.files.repository.FileRepository;
 import capstone.miso.dishcovery.application.files.search.GwangjinFileComponent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,14 +28,13 @@ import java.util.Optional;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class FileService {
+public class KWANGJINFileService {
     private final FileRepository fileRepository;
-    private final FileDataRepository fileDataRepository;
-    private final DownloadFileComponent downloadFileComponent;
+    private final KWANGJINFileDownloader KWANGJINFileDownloader;
     private final GwangjinFileComponent gwangjinFileComponent;
-    private final EXCELToFileConvertor excelToTextConvertor;
-    private final PDFToFileConvertor pdfToTextConvertor;
-    private final ModelMapper modelMapper;
+    private final KWANGJINExcelConvertor excelToTextConvertor;
+    private final KWANGJINPdfConvertor pdfToTextConvertor;
+    private final static String KWANGJIN = "광진구";
 
     public void changeFileConvertedStatus(Long fid) {
         Optional<Files> result = fileRepository.findById(fid);
@@ -45,12 +42,6 @@ public class FileService {
         files.changeConvertStatus(true);
         fileRepository.save(files);
     }
-
-    public List<Files> getFileLists() {
-        List<Files> result = fileRepository.findAll();
-        return result;
-    }
-
     public void downloadFile() {
         Optional<List<Files>> result = fileRepository.findByFileDownloaded(false);
         List<Files> files = result.orElse(null);
@@ -58,18 +49,23 @@ public class FileService {
         if (Objects.isNull(files))
             return;
 
+        int count = 0;
         for (Files f : files) {
             try {
-                Files dFile = downloadFileComponent.downloadFile(f);
+                Files dFile = KWANGJINFileDownloader.downloadFile(f);
+                count++;
+                dFile.setRegion(KWANGJIN);
                 fileRepository.save(dFile);
             } catch (RuntimeException e) {
                 log.error("File Download Failed");
             }
         }
+        log.info(LocalDate.now() + " 파일 Download 개수: " + count);
     }
     @Transactional
     public void loadFiles(Long page, String sdate, String edate) {
         List<Files> files = gwangjinFileComponent.loadFile(page, sdate, edate);
+        log.info(LocalDate.now() + " 파일 Load 개수: " + files.size());
         // 이미 저장된 파일 리스트는 검색에서 제외한다.
         for (Files f : files) {
             String department = f.getDepartment();
@@ -102,9 +98,11 @@ public class FileService {
                     yield null;
                 }
             };
-
-            if (Objects.isNull(fileData))
+            if (Objects.isNull(fileData)) {
+                f.setConverted(false);
+                f.setConvertResult("File Convert Failed");
                 continue;
+            }
 
             fileData.forEach(fd -> {
                 if (Objects.nonNull(fd)) {
@@ -112,7 +110,7 @@ public class FileService {
                 }
             });
         }
-
+        log.info(LocalDate.now() + " 파일 데이터 Convert: " + fileDataList.size());
         fileRepository.saveAll(files);
     }
 
@@ -168,13 +166,5 @@ public class FileService {
         }
 
         return fileDTOS;
-    }
-
-    public void checkFileExists() {
-        String department = "어르신복지과";
-        LocalDate date = LocalDate.parse("2023-04-11");
-
-        boolean b = fileRepository.existsByDepartmentAndFileUploaded(department, date);
-        log.info("EXISTS?: " + b);
     }
 }

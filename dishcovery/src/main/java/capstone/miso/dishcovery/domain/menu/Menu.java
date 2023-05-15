@@ -6,9 +6,14 @@ package capstone.miso.dishcovery.domain.menu;
  * description   :
  **/
 import capstone.miso.dishcovery.domain.BaseEntity;
+import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter

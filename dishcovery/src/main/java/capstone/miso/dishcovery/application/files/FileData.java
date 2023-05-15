@@ -42,6 +42,7 @@ public class FileData extends BaseEntity {
     private int cost;
     private String paymentOption;
     private String expenditure;
+    private String region;
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "file_id")
     private Files files;

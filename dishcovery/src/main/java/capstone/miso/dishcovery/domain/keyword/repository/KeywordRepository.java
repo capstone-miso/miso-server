@@ -4,6 +4,7 @@ package capstone.miso.dishcovery.domain.keyword.repository;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.store.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -13,6 +14,6 @@ import java.util.List;
  * description   :
  **/
 
-public interface CategoryRepository extends JpaRepository<Keyword, Long> {
-    List<Keyword> findByStore(Store store);
+public interface KeywordRepository extends JpaRepository<Keyword, Long> {
+    List<Keyword> findByStore_Sid(Long sid);
 }

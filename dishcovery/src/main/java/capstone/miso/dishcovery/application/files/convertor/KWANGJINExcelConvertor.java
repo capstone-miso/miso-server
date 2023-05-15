@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.application.files.convertor;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.application.files.Files;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +18,9 @@ import java.util.*;
  * date          : 2023-03-21
  * description   :
  **/
+@Log4j2
 @Component
-public class EXCELToFileConvertor implements FileConvertor {
+public class KWANGJINExcelConvertor implements FileConvertor {
     @Value("${gong.file.path}")
     private String path;
     private final static String[] date = {"일자", "집행일"};
@@ -121,7 +123,7 @@ public class EXCELToFileConvertor implements FileConvertor {
                 return result;
             }
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -172,6 +174,7 @@ public class EXCELToFileConvertor implements FileConvertor {
                         .files(file)
                         .build();
 
+                fileData.setRegion(file.getRegion());
                 fileDatas.add(fileData);
             } catch (Exception e) {
             }

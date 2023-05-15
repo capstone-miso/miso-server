@@ -1,6 +1,7 @@
 package capstone.miso.dishcovery.domain.store.service;
 
 import capstone.miso.dishcovery.domain.image.QImage;
+import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
@@ -43,8 +44,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
-        QKeyword keyword = QKeyword.keyword;
         QImage image = QImage.image;
+        QKeyword keyword = QKeyword.keyword1;
 
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
         String imageSql = """
@@ -89,7 +90,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
 
             // Pagination 처리
-            this.getQuerydsl().applyPagination(pageable, dtoQuery);
+            Objects.requireNonNull(this.getQuerydsl()).applyPagination(pageable, dtoQuery);
         } else {
             pageable = PageRequest.of(0, 10);
         }
@@ -102,6 +103,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
     private Map<String, BooleanExpression> booleanExpressionMap(StoreSearchCondition condition, QStore store, QKeyword keyword) {
         Map<String, BooleanExpression> expressionMap = new HashMap<>();
+        if (condition.keyword() != null) {
+            expressionMap.put("keyword", keyword.keyword.stringValue().eq(condition.keyword()));
+        }
         if (condition.storeId() != null) {
             expressionMap.put("storeId", store.sid.eq(condition.storeId()));
         }
@@ -111,9 +115,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         if (condition.category() != null) {
             expressionMap.put("category", store.category.contains(condition.category()));
         }
-        if (condition.keyword() != null) {
-            expressionMap.put("keyword", keyword.keywordKeys.contains(condition.keyword()));
-        }
         if (condition.sector() != null) {
             expressionMap.put("sector", store.sector.containsIgnoreCase(condition.sector()));
         }
@@ -121,13 +122,13 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             expressionMap.put("lat", store.lat.between(condition.lat() - KM * condition.multi(), condition.lat() + KM * condition.multi()));
         }
         if (condition.lon() != null) {
-            expressionMap.put("lon", store.lon.between(condition.lon() - KM * condition.multi(), condition.lat() + KM * condition.multi()));
+            expressionMap.put("lon", store.lon.between(condition.lon() - KM * condition.multi(), condition.lon() + KM * condition.multi()));
         }
         return expressionMap;
     }
 
     private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
-        List<OrderSpecifier<?>> orderSpecifiers = pageable.getSort().stream()
+        return pageable.getSort().stream()
                 .map(order -> {
                     if (order.getProperty().equalsIgnoreCase("sid")) {
                         return order.isDescending() ? store.sid.desc() : store.sid.asc();
@@ -149,17 +150,18 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return orderSpecifiers;
     }
 
     private void addKeywordList(StoreShortDTO storeShortDTO) {
-        QKeyword keyword = QKeyword.keyword;
-        JPQLQuery<String> dtoQuery = from(keyword)
-                .select(keyword.keywordKeys)
+        QKeyword keyword = QKeyword.keyword1;
+        List<String> keywords = from(keyword)
+                .select(keyword.keyword)
                 .where(keyword.store.sid.eq(storeShortDTO.getId()))
-                .groupBy(keyword.keywordKeys);
-
-        storeShortDTO.setKeywords(dtoQuery.fetch());
+                .fetch()
+                .stream()
+                .map(Enum::name)
+                .toList();
+        storeShortDTO.setKeywords(keywords);
     }
 
 }

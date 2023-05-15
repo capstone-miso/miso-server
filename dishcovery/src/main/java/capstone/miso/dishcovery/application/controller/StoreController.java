@@ -33,8 +33,8 @@ public class StoreController {
     private final StoreService storeService;
     private final StoreAndPreferenceService storeAndPreferenceService;
 
-    @Operation(summary = "가게 간략한 정보", description = "매장 리스트에 올라가는 간단한 매장 리스트 정보")
-    @GetMapping(value = "/list", produces = "application/json;charset=UTF-8")
+    @Operation(summary = "가게 간략한 정보 리스트", description = "매장 리스트에 올라가는 간단한 매장 리스트 정보")
+    @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @PreAuthorize("permitAll()")
     public PageResponseDTO<StoreShortDTO> loadStoreShort(@Valid PageRequestDTO pageRequestDTO, @AuthenticationPrincipal MemberSecurityDTO member, HttpServletRequest httpServletRequest) {
         pageRequestDTO = pageRequestDTO == null ? new PageRequestDTO() : pageRequestDTO;

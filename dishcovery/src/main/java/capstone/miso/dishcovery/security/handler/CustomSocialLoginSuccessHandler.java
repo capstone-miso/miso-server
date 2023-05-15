@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -25,15 +26,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JWTUtil jwtUtil;
-    private final PasswordEncoder passwordEncoder;
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-        MemberSecurityDTO memberSecurityDTO = (MemberSecurityDTO) authentication.getPrincipal();
-
-        Map<String, Object> claim = Map.of("email", authentication.getName());
+        Map<String, Object> claim = Map.of("email", authentication.getName(),
+                "roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
         // Access token
         String accessToken = jwtUtil.generateToken(claim, 5);
