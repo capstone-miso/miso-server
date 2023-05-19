@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.application.files.repository;
 
 import capstone.miso.dishcovery.domain.keyword.dao.KeywordDataDAO;
 import capstone.miso.dishcovery.domain.keyword.dao.KeywordManagerDAO;
+import capstone.miso.dishcovery.domain.store.dto.StoreTimeTableDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -59,6 +60,24 @@ public class FileDataJdbcRepository {
             .costUnder15000(rs.getLong("cost_under_15000"))
             .costUnder25000(rs.getLong("cost_under_25000"))
             .costOver25000(rs.getLong("cost_over_25000"))
+            .build();
+
+    static final RowMapper<StoreTimeTableDTO> rowMapperFileDataToStoreTimeTable = (rs, rowNum) -> StoreTimeTableDTO.builder()
+            .until8(rs.getLong("until8"))
+            .hour9(rs.getLong("hour9"))
+            .hour10(rs.getLong("hour10"))
+            .hour11(rs.getLong("hour11"))
+            .hour12(rs.getLong("hour12"))
+            .hour13(rs.getLong("hour13"))
+            .hour14(rs.getLong("hour14"))
+            .hour15(rs.getLong("hour15"))
+            .hour16(rs.getLong("hour16"))
+            .hour17(rs.getLong("hour17"))
+            .hour18(rs.getLong("hour18"))
+            .hour19(rs.getLong("hour19"))
+            .hour20(rs.getLong("hour20"))
+            .hour21(rs.getLong("hour21"))
+            .after22(rs.getLong("after22"))
             .build();
 
     public List<KeywordDataDAO> getAllKeywordDataFromFileData() {
@@ -128,6 +147,7 @@ public class FileDataJdbcRepository {
             return null;
         else return result.get(0);
     }
+
     public List<KeywordDataDAO> getKeywordDataFromFileData() {
         var sql = String.format("""
                 SELECT f.store_id                                                            AS 'store_id',
@@ -166,5 +186,29 @@ public class FileDataJdbcRepository {
 
         MapSqlParameterSource param = new MapSqlParameterSource().addValue("date", LocalDate.now());
         return namedParameterJdbcTemplate.query(sql, param, rowMapperFileDataToKeywordData);
+    }
+
+    public StoreTimeTableDTO getStoreTimeTableDTO(Long storeId) {
+        var sql = String.format("""
+                SELECT COUNT(CASE WHEN HOUR(f.time) < 8 THEN 1 END)   AS 'until8',
+                       COUNT(CASE WHEN HOUR(f.time) = 9 THEN 1 END)   AS 'hour9',
+                       COUNT(CASE WHEN HOUR(f.time) = 10 THEN 1 END)  AS 'hour10',
+                       COUNT(CASE WHEN HOUR(f.time) = 11 THEN 1 END)  AS 'hour11',
+                       COUNT(CASE WHEN HOUR(f.time) = 12 THEN 1 END)  AS 'hour12',
+                       COUNT(CASE WHEN HOUR(f.time) = 13 THEN 1 END)  AS 'hour13',
+                       COUNT(CASE WHEN HOUR(f.time) = 14 THEN 1 END)  AS 'hour14',
+                       COUNT(CASE WHEN HOUR(f.time) = 15 THEN 1 END)  AS 'hour15',
+                       COUNT(CASE WHEN HOUR(f.time) = 16 THEN 1 END)  AS 'hour16',
+                       COUNT(CASE WHEN HOUR(f.time) = 17 THEN 1 END)  AS 'hour17',
+                       COUNT(CASE WHEN HOUR(f.time) = 18 THEN 1 END)  AS 'hour18',
+                       COUNT(CASE WHEN HOUR(f.time) = 19 THEN 1 END)  AS 'hour19',
+                       COUNT(CASE WHEN HOUR(f.time) = 20 THEN 1 END)  AS 'hour20',
+                       COUNT(CASE WHEN HOUR(f.time) = 21 THEN 1 END)  AS 'hour21',
+                       COUNT(CASE WHEN HOUR(f.time) >= 22 THEN 1 END) AS 'after22'
+                FROM %s f
+                WHERE store_id = :storeId
+                """, TABLE);
+        MapSqlParameterSource param = new MapSqlParameterSource().addValue("storeId", storeId);
+        return namedParameterJdbcTemplate.queryForObject(sql, param, rowMapperFileDataToStoreTimeTable);
     }
 }

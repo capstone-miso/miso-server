@@ -4,6 +4,7 @@ import capstone.miso.dishcovery.application.service.StoreAndPreferenceService;
 import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
+import capstone.miso.dishcovery.domain.store.service.StoreSearch;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +48,7 @@ public class PreferenceController {
         return ResponseEntity.ok(new DeletePreferenceRes("또갈집 삭제 성공!"));
     }
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
-    @Operation(summary = "My 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
+    @Operation(summary = "나의 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     public PageResponseDTO<StoreShortDTO> findMyStores(@RequestParam(value = "page", defaultValue = "1", required = false) @Valid @Min(value = 1L, message = "페이지 번호는 1 이상 입니다.") int page,
                                                        @RequestParam(value = "size", defaultValue = "10", required = false) int size,
@@ -74,5 +75,13 @@ public class PreferenceController {
                                              @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                              @AuthenticationPrincipal MemberSecurityDTO member){
         return storeAndPreferenceService.famousStore(page, size, member.getMember());
+    }
+    @GetMapping("/similar")
+    @Operation(summary = "비슷한 또갈집", description = "나의 또갈집 키워드로 비슷한 또갈집 추천")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public List<StoreShortDTO> similarStores(@RequestParam(value = "page",required = false, defaultValue = "0") int page,
+                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
+                                             @AuthenticationPrincipal MemberSecurityDTO member){
+        return storeAndPreferenceService.similarStore(page, size, member.getMember());
     }
 }

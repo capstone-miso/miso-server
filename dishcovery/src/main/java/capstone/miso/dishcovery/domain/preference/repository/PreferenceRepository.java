@@ -26,7 +26,6 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long> {
             "WHERE p.member = :member " +
             "GROUP BY p.store")
     Page<PreferenceDAO> findMyPreferenceStores(@Param("member") Member member, Pageable pageable);
-
     Optional<Preference> findByMemberAndStore(Member member, Store store);
     @Query("SELECT p.store.sid FROM Preference p WHERE p.pid = :pid")
     Long findStoreIdByPreferenceKey(@Param("pid") Long pid);
@@ -34,4 +33,13 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long> {
     Page<Long> findFamousStores(Pageable pageable);
     @Query("SELECT p.pid FROM Preference p WHERE p.member = :member AND p.store.sid = :sid")
     List<Long> checkMyStorePreference(@Param("member") Member member,@Param("sid") Long sid, Pageable pageable);
+    @Query("SELECT k.store.sid FROM Keyword k " +
+            "WHERE k.keyword IN ( " +
+            "SELECT sk.keyword FROM Keyword sk " +
+            "WHERE sk.store IN (" +
+            "SELECT p.store FROM Preference p " +
+            "WHERE p.member = :member) " +
+            "GROUP BY sk.keyword)")
+    List<Long> findStoreInMyInterest(@Param("member") Member member, Pageable pageable);
+    boolean existsByMemberAndStore_Sid(Member member, Long storeSid);
 }

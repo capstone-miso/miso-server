@@ -6,6 +6,8 @@ import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
 
+import java.util.List;
+
 /**
  * author        : duckbill413
  * date          : 2023-04-27

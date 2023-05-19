@@ -23,6 +23,9 @@ public class KeywordData extends BaseEntity {
     private long totalVisited;
     private long totalCost;
     private long totalParticipants;
+    private long highTotalVisited;
+    private long highTotalCost;
+    private long highTotalParticipants;
     private long costPerPerson;
     private long spring;
     private long summer;

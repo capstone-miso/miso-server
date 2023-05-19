@@ -1,5 +1,6 @@
 package capstone.miso.dishcovery.application.service;
 
+import capstone.miso.dishcovery.application.files.repository.FileDataJdbcRepository;
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.Preference;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceDAO;
@@ -22,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +69,7 @@ public class StoreAndPreferenceService {
                 .size(size)
                 .sort(List.of("updatedAt.desc"))
                 .build();
-        
+
         List<StoreShortDTO> stores = new ArrayList<>();
 
         Pageable pageRequest = pageRequestDTO.getPageable();
@@ -106,6 +106,16 @@ public class StoreAndPreferenceService {
         return famousStores;
     }
 
+    public List<StoreShortDTO> similarStore(int page, int size, Member member) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        var result = preferenceRepository.findStoreInMyInterest(member, pageRequest);
+
+        StoreSearchCondition condition = new StoreSearchCondition(result);
+        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, pageRequest);
+
+        return storeShortDTOS.getContent();
+    }
+
     public PageResponseDTO<StoreShortDTO> listWithStoreShortWithPreference(PageRequestDTO pageRequestDTO, Member member) {
         PageResponseDTO<StoreShortDTO> result = storeService.listWithStoreShort(pageRequestDTO);
         result.getDtoList().forEach(storeShortDTO -> storeShortDTO.setPreference(checkMyStorePreference(member, storeShortDTO.getId())));
@@ -117,11 +127,12 @@ public class StoreAndPreferenceService {
         result.setPreference(checkMyStorePreference(member, sid));
         return result;
     }
-
     private boolean checkMyStorePreference(Member member, Long storeId) {
         List<Long> result = preferenceRepository.checkMyStorePreference(member, storeId, PageRequest.of(0, 1));
-        if (result.size() > 0)
-            return true;
-        return false;
+        return result.size() > 0;
+    }
+    public void setMyStorePreference(Member member, StoreShortDTO storeShortDTO) {
+        boolean myPreference = preferenceRepository.existsByMemberAndStore_Sid(member, storeShortDTO.getId());
+        storeShortDTO.setPreference(myPreference);
     }
 }

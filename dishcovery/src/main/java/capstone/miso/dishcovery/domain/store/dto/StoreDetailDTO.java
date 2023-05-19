@@ -50,4 +50,6 @@ public class StoreDetailDTO {
         private List<String> images;
         @Schema(description = "매장 메뉴 정보")
         private List<MenuDTO> menus;
+        @Schema(description = "매장 방문 시간 정보")
+        private StoreTimeTableDTO visitedTime;
 }

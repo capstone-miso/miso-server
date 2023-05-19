@@ -21,10 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -32,22 +29,34 @@ import java.util.stream.Collectors;
  * author        : duckbill413
  * date          : 2023-04-27
  * description   :
- **/
+ */
 @Log4j2
 public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreSearch {
-    private final double KM = 0.0045d;
+    private final static double KM = 0.0045d;
 
     public StoreSearchImpl() {
         super(Store.class);
     }
 
+    /**
+     * 간단한 매장 리스트 추출
+     * 카테고리 및 키워드를 기반으로 매장 리스트 조회
+     * 매장 리스트에는 해당 매장의 키워드 및 나의 관심매장 정보 추가
+     * @param condition (매장 ID, 매장명, 카테고리, 키워드, 구역, 위도, 경도, 지도배율)
+     * @param pageable
+     * @return
+     */
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
         QImage image = QImage.image;
         QKeyword keyword = QKeyword.keyword1;
-
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
+        /*
+          매장 이미지 조회 SQL
+          photoId 가 'M'인 이미지를 최우선으로 하나 조회
+          만일 'M'인 이미지가 없는 경우 가장 처음 이미지 하나만 로드해 온다.
+         */
         String imageSql = """
                 (SELECT i.imageUrl
                 FROM Image i
@@ -88,7 +97,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         if (pageable != null) {
             List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable, store);
             dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
-
             // Pagination 처리
             Objects.requireNonNull(this.getQuerydsl()).applyPagination(pageable, dtoQuery);
         } else {
@@ -104,10 +112,10 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     private Map<String, BooleanExpression> booleanExpressionMap(StoreSearchCondition condition, QStore store, QKeyword keyword) {
         Map<String, BooleanExpression> expressionMap = new HashMap<>();
         if (condition.keyword() != null) {
-            expressionMap.put("keyword", keyword.keyword.stringValue().eq(condition.keyword()));
+            expressionMap.put("keyword", keyword.keyword.stringValue().containsIgnoreCase(condition.keyword()));
         }
         if (condition.storeId() != null) {
-            expressionMap.put("storeId", store.sid.eq(condition.storeId()));
+            expressionMap.put("storeId", store.sid.in(condition.storeId()));
         }
         if (condition.storeName() != null) {
             expressionMap.put("storeName", store.name.contains(condition.storeName()));
@@ -126,7 +134,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         }
         return expressionMap;
     }
-
     private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
         return pageable.getSort().stream()
                 .map(order -> {
@@ -152,6 +159,10 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 매장에 키워드 정보 추가
+     * @param storeShortDTO
+     */
     private void addKeywordList(StoreShortDTO storeShortDTO) {
         QKeyword keyword = QKeyword.keyword1;
         List<String> keywords = from(keyword)

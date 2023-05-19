@@ -1,5 +1,6 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.application.files.repository.FileDataJdbcRepository;
 import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
@@ -20,9 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * author        : duckbill413
@@ -34,10 +33,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
-
+    private final FileDataJdbcRepository fileDataJdbcRepository;
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
-        StoreSearchCondition condition = new StoreSearchCondition(pageRequestDTO.getStoreId(), pageRequestDTO.getStoreName(),
+        StoreSearchCondition condition = new StoreSearchCondition(Collections.singletonList(pageRequestDTO.getStoreId()), pageRequestDTO.getStoreName(),
                 pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector(), pageRequestDTO.getLat(), pageRequestDTO.getLon(),
                 pageRequestDTO.getMulti());
         Pageable pageable = pageRequestDTO.getPageable("updatedAt.desc");
@@ -75,19 +74,16 @@ public class StoreServiceImpl implements StoreService {
                 store.getImages().stream().findFirst().orElse(new Image())
         ).getImageUrl();
         // 매장 키워드 조회
-//        List<Keyword> storeKeywords = store.getKeywords();
-//        List<String> keywords = new ArrayList<>();
-//        for (Keyword storeKeyword : storeKeywords) {
-//            List<KeywordData> keywordDataList = storeKeyword.getKeywordDataList();
-//            keywordDataList.forEach(keywordData -> keywords.add(keywordData.getKeyword().toString()));
-//        }
+        List<Keyword> storeKeywords = store.getKeywords();
+        List<String> keywords = storeKeywords.stream().map(keyword -> keyword.getKeyword().toString()).toList();
 
         storeDetailDTO.setOnInfo(onInfo);
         storeDetailDTO.setOffInfo(offInfo);
         storeDetailDTO.setMenus(menus);
         storeDetailDTO.setMainImage(mainImage);
         storeDetailDTO.setImages(images);
-//        storeDetailDTO.setKeywords(keywords);
+        storeDetailDTO.setKeywords(keywords);
+        storeDetailDTO.setVisitedTime(fileDataJdbcRepository.getStoreTimeTableDTO(sid));
 
         return storeDetailDTO;
     }
