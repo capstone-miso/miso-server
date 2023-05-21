@@ -1,6 +1,6 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,25 +8,33 @@ import java.util.List;
  * date          : 2023-04-27
  * description   :
  **/
+import lombok.*;
 
-public record StoreSearchCondition(
-        List<Long> storeId,
-        String storeName,
-        String category,
-        String keyword,
-        String sector,
-        Double lat,
-        Double lon,
-        Double multi
-) {
-    public StoreSearchCondition(Long... storeId) {
-        this(Arrays.stream(storeId).toList(), null, null, null, null, null, null, 1.0);
-    }
-    public StoreSearchCondition(String storeName){
-        this(null, storeName, null, null, null, null, null, 1.0);
-    }
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class StoreSearchCondition {
+    private List<Long> storeId;
+    private String storeName;
+    private String category;
+    private String keyword;
+    private String sector;
+    private Double lat;
+    private Double lon;
+    private Double multi;
 
     public StoreSearchCondition(List<Long> storeIds) {
-        this(storeIds, null, null, null, null, null, null, null);
+        this.storeId = storeIds;
+    }
+    public void setStoreId(List<Long> storeId) {
+        this.storeId = storeId;
+    }
+    public void setStoreId(Long storeId) {
+        if (storeId == null){
+            return;
+        }
+        this.storeId = Collections.singletonList(storeId);
     }
 }

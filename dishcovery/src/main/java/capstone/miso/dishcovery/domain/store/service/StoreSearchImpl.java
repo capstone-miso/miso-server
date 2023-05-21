@@ -81,6 +81,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .select(Projections.fields(StoreShortDTO.class,
                         store.sid.as("id"),
                         store.name.as("storeName"),
+                        store.address,
+                        store.phone,
                         store.lat,
                         store.lon,
                         store.category,
@@ -88,9 +90,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         ExpressionUtils.as(subQuery, "mainImage")
                 ));
         // INFO: 위치 정보로 조건 및 정렬
-        if (condition.lat() != null && condition.lon() != null) {
+        if (condition.getLat() != null && condition.getLon() != null) {
             dtoQuery.orderBy(Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
-                            store.lat, condition.lat(), store.lon, condition.lon())
+                            store.lat, condition.getLat(), store.lon, condition.getLon())
                     .asc());
         }
         // MEMO: Order 조건 추가 가능
@@ -111,26 +113,26 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
     private Map<String, BooleanExpression> booleanExpressionMap(StoreSearchCondition condition, QStore store, QKeyword keyword) {
         Map<String, BooleanExpression> expressionMap = new HashMap<>();
-        if (condition.keyword() != null) {
-            expressionMap.put("keyword", keyword.keyword.stringValue().containsIgnoreCase(condition.keyword()));
+        if (condition.getKeyword() != null) {
+            expressionMap.put("keyword", keyword.keyword.stringValue().containsIgnoreCase(condition.getKeyword()));
         }
-        if (condition.storeId() != null) {
-            expressionMap.put("storeId", store.sid.in(condition.storeId()));
+        if (condition.getStoreId() != null && condition.getStoreId().size() > 0) {
+            expressionMap.put("storeId", store.sid.in(condition.getStoreId()));
         }
-        if (condition.storeName() != null) {
-            expressionMap.put("storeName", store.name.contains(condition.storeName()));
+        if (condition.getStoreName() != null) {
+            expressionMap.put("storeName", store.name.contains(condition.getStoreName()));
         }
-        if (condition.category() != null) {
-            expressionMap.put("category", store.category.contains(condition.category()));
+        if (condition.getCategory() != null) {
+            expressionMap.put("category", store.category.contains(condition.getCategory()));
         }
-        if (condition.sector() != null) {
-            expressionMap.put("sector", store.sector.containsIgnoreCase(condition.sector()));
+        if (condition.getSector() != null) {
+            expressionMap.put("sector", store.sector.containsIgnoreCase(condition.getSector()));
         }
-        if (condition.lat() != null) {
-            expressionMap.put("lat", store.lat.between(condition.lat() - KM * condition.multi(), condition.lat() + KM * condition.multi()));
+        if (condition.getLat() != null) {
+            expressionMap.put("lat", store.lat.between(condition.getLat() - KM * condition.getMulti(), condition.getLat() + KM * condition.getMulti()));
         }
-        if (condition.lon() != null) {
-            expressionMap.put("lon", store.lon.between(condition.lon() - KM * condition.multi(), condition.lon() + KM * condition.multi()));
+        if (condition.getLon() != null) {
+            expressionMap.put("lon", store.lon.between(condition.getLon() - KM * condition.getMulti(), condition.getLon() + KM * condition.getMulti()));
         }
         return expressionMap;
     }
@@ -161,7 +163,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
     /**
      * 매장에 키워드 정보 추가
-     * @param storeShortDTO
      */
     private void addKeywordList(StoreShortDTO storeShortDTO) {
         QKeyword keyword = QKeyword.keyword1;

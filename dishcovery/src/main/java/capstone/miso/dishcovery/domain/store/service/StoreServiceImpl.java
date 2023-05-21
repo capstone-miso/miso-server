@@ -36,9 +36,16 @@ public class StoreServiceImpl implements StoreService {
     private final FileDataJdbcRepository fileDataJdbcRepository;
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
-        StoreSearchCondition condition = new StoreSearchCondition(Collections.singletonList(pageRequestDTO.getStoreId()), pageRequestDTO.getStoreName(),
-                pageRequestDTO.getCategory(), pageRequestDTO.getKeyword(), pageRequestDTO.getSector(), pageRequestDTO.getLat(), pageRequestDTO.getLon(),
-                pageRequestDTO.getMulti());
+        StoreSearchCondition condition = StoreSearchCondition.builder()
+                .storeName(pageRequestDTO.getStoreName())
+                .category(pageRequestDTO.getCategory())
+                .keyword(pageRequestDTO.getKeyword())
+                .sector(pageRequestDTO.getSector())
+                .lat(pageRequestDTO.getLat())
+                .lon(pageRequestDTO.getLon())
+                .multi(pageRequestDTO.getMulti()).build();
+        condition.setStoreId(pageRequestDTO.getStoreId());
+
         Pageable pageable = pageRequestDTO.getPageable("updatedAt.desc");
 
         Page<StoreShortDTO> result = storeRepository.searchAllStoreShort(condition, pageable);

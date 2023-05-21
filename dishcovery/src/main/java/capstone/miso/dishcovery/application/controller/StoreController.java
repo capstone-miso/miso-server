@@ -39,8 +39,7 @@ public class StoreController {
     public PageResponseDTO<StoreShortDTO> loadStoreShort(@Valid PageRequestDTO pageRequestDTO, @AuthenticationPrincipal MemberSecurityDTO member, HttpServletRequest httpServletRequest) {
         pageRequestDTO = pageRequestDTO == null ? new PageRequestDTO() : pageRequestDTO;
 
-
-        PageResponseDTO responseDTO;
+        PageResponseDTO<StoreShortDTO> responseDTO;
         if (member == null) {
             responseDTO = storeService.listWithStoreShort(pageRequestDTO);
         } else {
@@ -53,7 +52,7 @@ public class StoreController {
         String requestURL = httpServletRequest.getRequestURL().toString();
         String queryString = httpServletRequest.getQueryString();
 
-        // 쿼리 파라미터가 있다면 URL에 추가
+        // 쿼리 파라미터가 있다면 URL 추가
         if (queryString != null) {
             requestURL += "?" + queryString;
         }

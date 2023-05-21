@@ -1,6 +1,5 @@
 package capstone.miso.dishcovery.application.service;
 
-import capstone.miso.dishcovery.application.files.repository.FileDataJdbcRepository;
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.Preference;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceDAO;
@@ -77,7 +76,10 @@ public class StoreAndPreferenceService {
 
         preferences.getContent().forEach(preference -> {
             Long storeId = preference.getStore().getSid();
-            Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(new StoreSearchCondition(storeId), null);
+            StoreSearchCondition condition = StoreSearchCondition.builder().build();
+            condition.setStoreId(storeId);
+
+            Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, pageRequest);
             storeShortDTOS.getContent().forEach(storeShortDTO -> storeShortDTO.setPreference(true));
 
             stores.addAll(storeShortDTOS.getContent());
@@ -127,10 +129,12 @@ public class StoreAndPreferenceService {
         result.setPreference(checkMyStorePreference(member, sid));
         return result;
     }
+
     private boolean checkMyStorePreference(Member member, Long storeId) {
         List<Long> result = preferenceRepository.checkMyStorePreference(member, storeId, PageRequest.of(0, 1));
         return result.size() > 0;
     }
+
     public void setMyStorePreference(Member member, StoreShortDTO storeShortDTO) {
         boolean myPreference = preferenceRepository.existsByMemberAndStore_Sid(member, storeShortDTO.getId());
         storeShortDTO.setPreference(myPreference);

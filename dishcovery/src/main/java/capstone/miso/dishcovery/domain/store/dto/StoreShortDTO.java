@@ -23,6 +23,10 @@ public class StoreShortDTO {
         private Long id;
         @Schema(description = "가게 이름")
         private String storeName;
+        @Schema(description = "가게 주소")
+        private String address;
+        @Schema(description = "전화번호")
+        private String phone;
         @Schema(description = "위도")
         private Double lat;
         @Schema(description = "경도")
