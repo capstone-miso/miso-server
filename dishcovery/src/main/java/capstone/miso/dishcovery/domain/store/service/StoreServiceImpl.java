@@ -4,6 +4,7 @@ import capstone.miso.dishcovery.application.files.repository.FileDataJdbcReposit
 import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
+import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
 import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.StoreOffInfo;
@@ -34,6 +35,7 @@ import java.util.*;
 public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final FileDataJdbcRepository fileDataJdbcRepository;
+    private final KeywordDataRepository keywordDataRepository;
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
         StoreSearchCondition condition = StoreSearchCondition.builder()
@@ -91,6 +93,9 @@ public class StoreServiceImpl implements StoreService {
         storeDetailDTO.setImages(images);
         storeDetailDTO.setKeywords(keywords);
         storeDetailDTO.setVisitedTime(fileDataJdbcRepository.getStoreTimeTableDTO(sid));
+
+        // Keyword Data 추가
+        Optional<KeywordData> topByStore = keywordDataRepository.findTopByStore(store);
 
         return storeDetailDTO;
     }

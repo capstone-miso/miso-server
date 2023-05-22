@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.security.Key;
 import java.util.List;
+import java.util.Optional;
 
 public interface KeywordDataRepository extends JpaRepository<KeywordData, Long> {
     @Query(value = "SELECT kd.kid FROM KeywordData kd WHERE kd.store = :store")
@@ -21,6 +22,7 @@ public interface KeywordDataRepository extends JpaRepository<KeywordData, Long> 
     List<KeywordData> findByStoreIsNotNull();
     @Query(value = "SELECT kd.store.sid FROM KeywordData kd WHERE kd.store.sid IN (SELECT k.store.sid FROM Keyword k WHERE k.keyword = :keyword)")
     List<Long> findStoreByKeyword(@Param("keyword") KeywordSet keywordSet, Pageable pageable);
+    Optional<KeywordData> findTopByStore(Store store);
     @Query(value = "SELECT kd.store.sid FROM KeywordData kd WHERE kd.store.sid IN (SELECT k.store.sid FROM Keyword k WHERE k.keyword = :keyword) ORDER BY kd.breakfast DESC ")
     List<Long> findStoreOrderByBreakfast(@Param("keyword") KeywordSet keywordSet, Pageable pageable);
     @Query(value = "SELECT kd.store.sid FROM KeywordData kd WHERE kd.store.sid IN (SELECT k.store.sid FROM Keyword k WHERE k.keyword = :keyword) ORDER BY kd.lunch DESC ")
