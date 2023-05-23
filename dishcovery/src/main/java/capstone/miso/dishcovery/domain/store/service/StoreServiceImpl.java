@@ -10,6 +10,7 @@ import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.StoreOffInfo;
 import capstone.miso.dishcovery.domain.store.StoreOnInfo;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
+import capstone.miso.dishcovery.domain.store.dto.StoreKeywordDataDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
@@ -17,10 +18,12 @@ import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 
 import java.util.*;
 
@@ -36,6 +39,7 @@ public class StoreServiceImpl implements StoreService {
     private final StoreRepository storeRepository;
     private final FileDataJdbcRepository fileDataJdbcRepository;
     private final KeywordDataRepository keywordDataRepository;
+    private final ModelMapper modelMapper;
     @Override
     public PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO) {
         StoreSearchCondition condition = StoreSearchCondition.builder()
@@ -95,7 +99,13 @@ public class StoreServiceImpl implements StoreService {
         storeDetailDTO.setVisitedTime(fileDataJdbcRepository.getStoreTimeTableDTO(sid));
 
         // Keyword Data 추가
-        Optional<KeywordData> topByStore = keywordDataRepository.findTopByStore(store);
+        Optional<KeywordData> storeKeywordData = keywordDataRepository.findTopByStore(store);
+        if (storeKeywordData.isPresent()){
+            StoreKeywordDataDTO storeKeywordDataDTO = modelMapper.map(storeKeywordData.get(), StoreKeywordDataDTO.class);
+            storeKeywordDataDTO.init();
+            storeDetailDTO.setKeywordData(storeKeywordDataDTO);
+        }
+
 
         return storeDetailDTO;
     }

@@ -1,4 +1,5 @@
 package capstone.miso.dishcovery.domain.store.dto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StoreTimeTableDTO {
-    private Long until8;
+    @Schema(description = "오전 8시 전(time<8)")
+    private Long under8;
     private Long hour9;
     private Long hour10;
     private Long hour11;
@@ -23,5 +25,6 @@ public class StoreTimeTableDTO {
     private Long hour19;
     private Long hour20;
     private Long hour21;
+    @Schema(description = "오후 10시 이후 (time>=22)")
     private Long after22;
 }

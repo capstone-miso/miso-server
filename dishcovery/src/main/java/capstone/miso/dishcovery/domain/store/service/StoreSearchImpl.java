@@ -1,7 +1,6 @@
 package capstone.miso.dishcovery.domain.store.service;
 
 import capstone.miso.dishcovery.domain.image.QImage;
-import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
@@ -33,15 +32,38 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreSearch {
     private final static double KM = 0.0045d;
+    private final static String[] CAFETERIA = {"음식점 > 한식%", "음식점 > 일식%", "음식점 > 양식%", "음식점 > 샤브샤브%", "음식점 > 패스트푸드%",
+            "음식점 > 중식%", "음식점 > 퓨전요리%", "음식점 > 아시아음식%", "음식점 > 분식%", "음식점 > 패밀리레스토랑%", "음식점 > 기사식당%", "음식점 > 치킨%",
+            "음식점 > 도시락%", "음식점 > 뷔페%", "음식점 > 샐러드%"};
+    private final static String[] DESSERT = {"음식점 > 간식%", "음식점 > 카페%"};
 
     public StoreSearchImpl() {
         super(Store.class);
+    }
+
+    private static BooleanExpression CAFETERIA_BOOLEAN_EXPRESSION() {
+        QStore store = QStore.store;
+        BooleanExpression expression = store.category.like(CAFETERIA[0]);
+        for (int i = 1; i < CAFETERIA.length; i++) {
+            expression.or(store.category.like(CAFETERIA[i]));
+        }
+        return expression;
+    }
+
+    private static BooleanExpression DESSERT_BOOLEAN_EXPRESSION() {
+        QStore store = QStore.store;
+        BooleanExpression expression = store.category.like(DESSERT[0]);
+        for (int i = 1; i < DESSERT.length; i++) {
+            expression.or(store.category.like(DESSERT[i]));
+        }
+        return expression;
     }
 
     /**
      * 간단한 매장 리스트 추출
      * 카테고리 및 키워드를 기반으로 매장 리스트 조회
      * 매장 리스트에는 해당 매장의 키워드 및 나의 관심매장 정보 추가
+     *
      * @param condition (매장 ID, 매장명, 카테고리, 키워드, 구역, 위도, 경도, 지도배율)
      * @param pageable
      * @return
@@ -123,7 +145,14 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             expressionMap.put("storeName", store.name.contains(condition.getStoreName()));
         }
         if (condition.getCategory() != null) {
-            expressionMap.put("category", store.category.contains(condition.getCategory()));
+            String searchCategory = condition.getCategory();
+            if (searchCategory.equals("식당")) {
+                expressionMap.put("category", CAFETERIA_BOOLEAN_EXPRESSION());
+            } else if (searchCategory.equals("디저트")) {
+                expressionMap.put("category", DESSERT_BOOLEAN_EXPRESSION());
+            } else {
+                expressionMap.put("category", store.category.contains(searchCategory));
+            }
         }
         if (condition.getSector() != null) {
             expressionMap.put("sector", store.sector.containsIgnoreCase(condition.getSector()));
@@ -136,6 +165,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         }
         return expressionMap;
     }
+
     private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
         return pageable.getSort().stream()
                 .map(order -> {

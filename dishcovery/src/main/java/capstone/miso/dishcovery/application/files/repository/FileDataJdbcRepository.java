@@ -63,7 +63,7 @@ public class FileDataJdbcRepository {
             .build();
 
     static final RowMapper<StoreTimeTableDTO> rowMapperFileDataToStoreTimeTable = (rs, rowNum) -> StoreTimeTableDTO.builder()
-            .until8(rs.getLong("until8"))
+            .under8(rs.getLong("under8"))
             .hour9(rs.getLong("hour9"))
             .hour10(rs.getLong("hour10"))
             .hour11(rs.getLong("hour11"))
@@ -190,7 +190,7 @@ public class FileDataJdbcRepository {
 
     public StoreTimeTableDTO getStoreTimeTableDTO(Long storeId) {
         var sql = String.format("""
-                SELECT COUNT(CASE WHEN HOUR(f.time) < 8 THEN 1 END)   AS 'until8',
+                SELECT COUNT(CASE WHEN HOUR(f.time) < 8 THEN 1 END)   AS 'under8',
                        COUNT(CASE WHEN HOUR(f.time) = 9 THEN 1 END)   AS 'hour9',
                        COUNT(CASE WHEN HOUR(f.time) = 10 THEN 1 END)  AS 'hour10',
                        COUNT(CASE WHEN HOUR(f.time) = 11 THEN 1 END)  AS 'hour11',

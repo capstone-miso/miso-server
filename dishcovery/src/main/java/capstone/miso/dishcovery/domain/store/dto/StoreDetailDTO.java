@@ -52,4 +52,6 @@ public class StoreDetailDTO {
         private List<MenuDTO> menus;
         @Schema(description = "매장 방문 시간 정보")
         private StoreTimeTableDTO visitedTime;
+        @Schema(description = "매장 키워드 데이터")
+        private StoreKeywordDataDTO keywordData;
 }
