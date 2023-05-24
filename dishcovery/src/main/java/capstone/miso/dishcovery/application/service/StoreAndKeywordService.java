@@ -4,7 +4,6 @@ import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordRepository;
 import capstone.miso.dishcovery.domain.member.Member;
-import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
@@ -24,7 +23,12 @@ public class StoreAndKeywordService {
     private final KeywordRepository keywordRepository;
 
     public PageResponseDTO<StoreShortDTO> findStoreByKeywordRank(KeywordSet keywordSet, SimplePageRequestDTO pageRequestDTO, Member member) {
-        Pageable pageable = pageRequestDTO.getPageable();
+        Pageable reqPageable = pageRequestDTO.getPageable();
+        int page = reqPageable.getPageNumber();
+        int size = reqPageable.getPageSize();
+
+        Pageable pageable = PageRequest.of(page, size);
+
         Page<Long> storeIds = switch (keywordSet) {
             // KeywordData Table
             case BREAKFAST -> keywordDataRepository.findStoreOrderByBreakfast(keywordSet, pageable);
@@ -51,7 +55,6 @@ public class StoreAndKeywordService {
         condition.setStoreIds(storeIds.getContent());
         condition.setMember(member);
 
-        int size = pageable.getPageSize();
         Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, size));
 
         return PageResponseDTO.<StoreShortDTO>builder()
