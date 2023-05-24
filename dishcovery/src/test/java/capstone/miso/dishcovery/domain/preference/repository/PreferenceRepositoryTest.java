@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
@@ -18,7 +19,7 @@ class PreferenceRepositoryTest {
     @DisplayName("Find Similar Preference Store")
     public void findSimilarPreferenceStoreTest() {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        List<Long> storeInMyInterest = preferenceRepository.findStoreInMyInterest(Member.builder().email("dishcovery@gmail.com").build(),
+        Page<Long> storeInMyInterest = preferenceRepository.findStoreInMyInterest(Member.builder().email("dishcovery@gmail.com").build(),
                 pageRequest);
 
         System.out.println(storeInMyInterest);

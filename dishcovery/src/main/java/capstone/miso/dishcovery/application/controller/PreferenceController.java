@@ -4,21 +4,18 @@ import capstone.miso.dishcovery.application.service.StoreAndPreferenceService;
 import capstone.miso.dishcovery.domain.preference.dto.DeletePreferenceRes;
 import capstone.miso.dishcovery.domain.preference.dto.SavePreferenceRes;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
-import capstone.miso.dishcovery.domain.store.service.StoreSearch;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
+import capstone.miso.dishcovery.dto.SimplePageRequestDTO;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * author        : duckbill413
@@ -50,12 +47,43 @@ public class PreferenceController {
     @GetMapping(value = "", produces = "application/json;charset=UTF-8")
     @Operation(summary = "나의 또갈집 조회", description = "내가 등록한 또갈집 매장목록 조회")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public PageResponseDTO<StoreShortDTO> findMyStores(@RequestParam(value = "page", defaultValue = "1", required = false) @Valid @Min(value = 1L, message = "페이지 번호는 1 이상 입니다.") int page,
-                                                       @RequestParam(value = "size", defaultValue = "10", required = false) int size,
+    public PageResponseDTO<StoreShortDTO> findMyStores(@Valid SimplePageRequestDTO pageRequestDTO,
                                                        @AuthenticationPrincipal MemberSecurityDTO member,
                                                        HttpServletRequest httpServletRequest){
-        PageResponseDTO<StoreShortDTO> responseDTO = storeAndPreferenceService.findMyPreferenceStores(member.getMember(), page, size);
+        pageRequestDTO = pageRequestDTO == null ? new SimplePageRequestDTO() : pageRequestDTO;
+        PageResponseDTO<StoreShortDTO> responseDTO = storeAndPreferenceService.findMyPreferenceStores(member.getMember(), pageRequestDTO);
 
+        setPageResponsePageLink(httpServletRequest, responseDTO);
+
+        return responseDTO;
+    }
+
+
+    @GetMapping("/famous")
+    @Operation(summary = "많이 또갈집", description = "다른 사람들이 많이 저장한 또갈집 리스트")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public PageResponseDTO<StoreShortDTO> famousStores(@Valid SimplePageRequestDTO pageRequestDTO,
+                                                       @AuthenticationPrincipal MemberSecurityDTO member,
+                                                       HttpServletRequest httpServletRequest){
+        pageRequestDTO = pageRequestDTO == null ? new SimplePageRequestDTO() : pageRequestDTO;
+        PageResponseDTO<StoreShortDTO> responseDTO = storeAndPreferenceService.famousStore(pageRequestDTO, member.getMember());
+
+        setPageResponsePageLink(httpServletRequest, responseDTO);
+        return responseDTO;
+    }
+    @GetMapping("/similar")
+    @Operation(summary = "비슷한 또갈집", description = "나의 또갈집 키워드로 비슷한 또갈집 추천")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
+    public PageResponseDTO<StoreShortDTO> similarStores(@Valid SimplePageRequestDTO pageRequestDTO,
+                                                        @AuthenticationPrincipal MemberSecurityDTO member,
+                                                        HttpServletRequest httpServletRequest){
+        pageRequestDTO = pageRequestDTO == null ? new SimplePageRequestDTO() : pageRequestDTO;
+
+        PageResponseDTO<StoreShortDTO> responseDTO = storeAndPreferenceService.similarStore(pageRequestDTO, member.getMember());
+        setPageResponsePageLink(httpServletRequest, responseDTO);
+        return responseDTO;
+    }
+    private void setPageResponsePageLink(HttpServletRequest httpServletRequest, PageResponseDTO<StoreShortDTO> responseDTO) {
         String requestURL = httpServletRequest.getRequestURL().toString();
         String queryString = httpServletRequest.getQueryString();
 
@@ -64,24 +92,5 @@ public class PreferenceController {
             requestURL += "?" + queryString;
         }
         responseDTO.setPageLink(requestURL);
-
-        return responseDTO;
-    }
-
-    @GetMapping("/famous")
-    @Operation(summary = "많이 또갈집", description = "다른 사람들이 많이 저장한 또갈집 리스트")
-    @PreAuthorize("isAuthenticated()")
-    public  List<StoreShortDTO> famousStores(@RequestParam(value = "page",required = false, defaultValue = "0") int page,
-                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-                                             @AuthenticationPrincipal MemberSecurityDTO member){
-        return storeAndPreferenceService.famousStore(page, size, member.getMember());
-    }
-    @GetMapping("/similar")
-    @Operation(summary = "비슷한 또갈집", description = "나의 또갈집 키워드로 비슷한 또갈집 추천")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public List<StoreShortDTO> similarStores(@RequestParam(value = "page",required = false, defaultValue = "0") int page,
-                                             @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-                                             @AuthenticationPrincipal MemberSecurityDTO member){
-        return storeAndPreferenceService.similarStore(page, size, member.getMember());
     }
 }

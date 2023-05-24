@@ -14,6 +14,7 @@ import java.util.List;
  * description   :
  **/
 public interface StoreService {
-    PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO);
-    StoreDetailDTO getStoreDetail(Long sid);
+    PageResponseDTO<StoreShortDTO> listWithStoreShort(PageRequestDTO pageRequestDTO, Member member);
+    StoreDetailDTO getStoreDetail(Long sid, Member member);
+    List<StoreShortDTO> getSimilarStoreShorts(Long sid, Member member);
 }

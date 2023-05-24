@@ -38,12 +38,12 @@ public class PageResponseDTO<T> {
     private String nextPage;
     @ToString.Exclude
     @JsonIgnore
-    private final PageRequestDTO pageRequestDTO;
+    private final SimplePageRequestDTO pageRequestDTO;
     @Schema(description = "데이터 리스트")
     private final List<T> dtoList;
 
     @Builder
-    public PageResponseDTO(PageRequestDTO pageRequestDTO, List<T> dtoList, int total) {
+    public PageResponseDTO(SimplePageRequestDTO pageRequestDTO, List<T> dtoList, int total) {
         this.pageRequestDTO = pageRequestDTO;
         this.dtoList = dtoList;
         this.total = total;
@@ -52,21 +52,14 @@ public class PageResponseDTO<T> {
             this.start = 0;
             this.end = 0;
             this.prev = this.next = false;
-
             return;
         }
 
         this.page = pageRequestDTO.getPage();
         this.size = pageRequestDTO.getSize();
-//        this.end = (int)(Math.ceil(this.page / 10.0)) * 10; // 화면에서의 마지막 번호 (10개 단위)
-//        this.start = this.end -9; // 화면에서의 시작 번호
+
         this.end = (int) (Math.ceil(this.total / (double) this.size)); // 전체 가능한 페이지 개수
         this.start = 1;
-
-//        int last = (int) (Math.ceil((total / (double) size)));
-//        this.end = end > last ? last : end;
-//        this.prev = this.start > 1;
-//        this.next = total > this.end * this.size;
         this.prev = this.page > 1;
         this.next = this.page < this.end;
     }

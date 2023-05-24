@@ -30,7 +30,7 @@ public class APIUserDetailsService implements UserDetailsService {
         Optional<Member> result = memberRepository.findByEmail(username);
         Member member = result.orElseThrow(() -> new UsernameNotFoundException("Cannot find user email"));
 
-        MemberSecurityDTO memberSecurityDTO = new MemberSecurityDTO(
+        return new MemberSecurityDTO(
                 member.getEmail(),
                 member.getPassword(),
                 member.getNickname(),
@@ -38,6 +38,5 @@ public class APIUserDetailsService implements UserDetailsService {
                         memberRole -> new SimpleGrantedAuthority("ROLE_" + memberRole.name())
                 ).collect(Collectors.toList())
         );
-        return memberSecurityDTO;
     }
 }

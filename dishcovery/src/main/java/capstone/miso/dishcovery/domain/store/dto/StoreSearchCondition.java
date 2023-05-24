@@ -8,6 +8,7 @@ import java.util.List;
  * date          : 2023-04-27
  * description   :
  **/
+import capstone.miso.dishcovery.domain.member.Member;
 import lombok.*;
 
 @Getter
@@ -24,11 +25,10 @@ public class StoreSearchCondition {
     private Double lat;
     private Double lon;
     private Double multi;
+    private long preference;
+    private Member member;
 
-    public StoreSearchCondition(List<Long> storeIds) {
-        this.storeId = storeIds;
-    }
-    public void setStoreId(List<Long> storeId) {
+    public void setStoreIds(List<Long> storeId) {
         this.storeId = storeId;
     }
     public void setStoreId(Long storeId) {

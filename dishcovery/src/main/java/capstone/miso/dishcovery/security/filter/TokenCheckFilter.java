@@ -71,13 +71,12 @@ public class TokenCheckFilter extends OncePerRequestFilter {
         String tokenType = headStr.substring(0, 6);
         String tokenStr = headStr.substring(7);
 
-        if (tokenType.equalsIgnoreCase("BEARER") == false) {
+        if (!tokenType.equalsIgnoreCase("BEARER")) {
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.BADTYPE);
         }
 
         try {
-            Map<String, Object> values = jwtUtil.validateToken(tokenStr);
-            return values;
+            return jwtUtil.validateToken(tokenStr);
         } catch (MalformedJwtException malformedJwtException) {
             throw new AccessTokenException(AccessTokenException.TOKEN_ERROR.MALFORM);
         } catch (SignatureException signatureException) {

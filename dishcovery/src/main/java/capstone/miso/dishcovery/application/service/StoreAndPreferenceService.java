@@ -2,16 +2,17 @@ package capstone.miso.dishcovery.application.service;
 
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.Preference;
-import capstone.miso.dishcovery.domain.preference.repository.PreferenceDAO;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
 import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
+import capstone.miso.dishcovery.domain.store.repository.StoreJDBCRepository;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import capstone.miso.dishcovery.domain.store.service.StoreService;
 import capstone.miso.dishcovery.dto.PageRequestDTO;
 import capstone.miso.dishcovery.dto.PageResponseDTO;
+import capstone.miso.dishcovery.dto.SimplePageRequestDTO;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,6 @@ public class StoreAndPreferenceService {
     private final StoreService storeService;
     private final StoreRepository storeRepository;
     private final PreferenceRepository preferenceRepository;
-    private final ModelMapper modelMapper;
 
     public void savePreference(Member member, Long storeId) {
         Optional<Store> findStore = storeRepository.findById(storeId);
@@ -61,82 +61,53 @@ public class StoreAndPreferenceService {
         preferenceRepository.delete(preference);
     }
 
-    @Transactional
-    public PageResponseDTO<StoreShortDTO> findMyPreferenceStores(Member member, int page, int size) {
-        PageRequestDTO pageRequestDTO = PageRequestDTO.builder()
-                .page(page)
-                .size(size)
-                .sort(List.of("updatedAt.desc"))
-                .build();
+    public PageResponseDTO<StoreShortDTO> findMyPreferenceStores(Member member, SimplePageRequestDTO pageRequestDTO) {
+        StoreSearchCondition condition = pageRequestDTO.getStoreSearchCondition();
+        condition.setPreference(1L);
+        condition.setMember(member);
+        Pageable pageable = pageRequestDTO.getPageable();
 
-        List<StoreShortDTO> stores = new ArrayList<>();
+        // 나의 관심 매장 조회
+        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, pageable.getPageSize()));
+        storeShortDTOS.forEach(storeShortDTO -> storeShortDTO.setPreference(true));
 
-        Pageable pageRequest = pageRequestDTO.getPageable();
-        Page<PreferenceDAO> preferences = preferenceRepository.findMyPreferenceStores(member, pageRequest);
-
-        preferences.getContent().forEach(preference -> {
-            Long storeId = preference.getStore().getSid();
-            StoreSearchCondition condition = StoreSearchCondition.builder().build();
-            condition.setStoreId(storeId);
-
-            Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, pageRequest);
-            storeShortDTOS.getContent().forEach(storeShortDTO -> storeShortDTO.setPreference(true));
-
-            stores.addAll(storeShortDTOS.getContent());
-        });
         return PageResponseDTO.<StoreShortDTO>builder()
                 .pageRequestDTO(pageRequestDTO)
-                .dtoList(stores)
-                .total(preferences.getTotalPages())
+                .dtoList(storeShortDTOS.getContent())
+                .total((int) storeShortDTOS.getTotalElements())
                 .build();
     }
 
-    public List<StoreShortDTO> famousStore(int page, int size, Member member) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        var result = preferenceRepository.findFamousStores(pageRequest);
-
-        List<StoreShortDTO> famousStores = new ArrayList<>();
-        for (Long sid : result) {
-            StoreDetailDTO store = storeService.getStoreDetail(sid);
-            StoreShortDTO storeShortDTO = modelMapper.map(store, StoreShortDTO.class);
-            storeShortDTO.setPreference(checkMyStorePreference(member, sid));
-
-            if (storeShortDTO.isPreference())
-                continue;
-            famousStores.add(storeShortDTO);
-        }
-        return famousStores;
+    public PageResponseDTO<StoreShortDTO> famousStore(SimplePageRequestDTO pageRequestDTO, Member member) {
+        StoreSearchCondition condition = pageRequestDTO.getStoreSearchCondition();
+        condition.setPreference(2L);
+        condition.setMember(member);
+        Pageable pageable = pageRequestDTO.getPageable();
+        // 나의 관심 목록에 없는 유명한 매장 조회
+        Page<Long> storeIds = preferenceRepository.findFamousStores(member, pageable);
+        condition.setStoreIds(storeIds.getContent());
+        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, pageable.getPageSize()));
+        return PageResponseDTO.<StoreShortDTO>builder()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(storeShortDTOS.getContent())
+                .total((int) storeIds.getTotalElements())
+                .build();
     }
 
-    public List<StoreShortDTO> similarStore(int page, int size, Member member) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        var result = preferenceRepository.findStoreInMyInterest(member, pageRequest);
+    public PageResponseDTO<StoreShortDTO> similarStore(SimplePageRequestDTO pageRequestDTO, Member member) {
+        StoreSearchCondition condition = pageRequestDTO.getStoreSearchCondition();
+        condition.setPreference(2L);
+        condition.setMember(member);
+        Pageable pageable = pageRequestDTO.getPageable();
+        // 나의 관심 매장과 유사한 매장 조회
+        Page<Long> storeIds = preferenceRepository.findStoreInMyInterest(member, pageable);
+        condition.setStoreIds(storeIds.getContent());
 
-        StoreSearchCondition condition = new StoreSearchCondition(result);
-        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, pageRequest);
-
-        return storeShortDTOS.getContent();
-    }
-
-    public PageResponseDTO<StoreShortDTO> listWithStoreShortWithPreference(PageRequestDTO pageRequestDTO, Member member) {
-        PageResponseDTO<StoreShortDTO> result = storeService.listWithStoreShort(pageRequestDTO);
-        result.getDtoList().forEach(storeShortDTO -> storeShortDTO.setPreference(checkMyStorePreference(member, storeShortDTO.getId())));
-        return result;
-    }
-
-    public StoreDetailDTO getStoreDetailWithPreference(Long sid, Member member) {
-        StoreDetailDTO result = storeService.getStoreDetail(sid);
-        result.setPreference(checkMyStorePreference(member, sid));
-        return result;
-    }
-
-    private boolean checkMyStorePreference(Member member, Long storeId) {
-        List<Long> result = preferenceRepository.checkMyStorePreference(member, storeId, PageRequest.of(0, 1));
-        return result.size() > 0;
-    }
-
-    public void setMyStorePreference(Member member, StoreShortDTO storeShortDTO) {
-        boolean myPreference = preferenceRepository.existsByMemberAndStore_Sid(member, storeShortDTO.getId());
-        storeShortDTO.setPreference(myPreference);
+        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, pageable.getPageSize()));
+        return PageResponseDTO.<StoreShortDTO>builder()
+                .pageRequestDTO(pageRequestDTO)
+                .dtoList(storeShortDTOS.getContent())
+                .total((int) storeIds.getTotalElements())
+                .build();
     }
 }

@@ -35,6 +35,8 @@ public class StoreShortDTO {
         private String category;
         @Schema(description = "가게 키워드")
         private List<String> keywords;
+        @Schema(description = "또갈집 개수")
+        private long preferenceCount;
         @Schema(description = "가게 구역")
         private String sector;
         @Schema(description = "가게 메인 이미지")

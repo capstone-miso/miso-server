@@ -1,7 +1,9 @@
 package capstone.miso.dishcovery.domain.store.service;
 
-import capstone.miso.dishcovery.domain.image.QImage;
+import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
+import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.preference.QPreference;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
@@ -20,7 +22,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -71,8 +76,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
-        QImage image = QImage.image;
+//        QImage image = QImage.image;
         QKeyword keyword = QKeyword.keyword1;
+        QPreference preference = QPreference.preference;
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
         /*
           매장 이미지 조회 SQL
@@ -91,7 +97,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
                 .leftJoin(keyword).on(store.sid.eq(keyword.store.sid).and(expression.get("keyword")))
-                .leftJoin(image).on(store.sid.eq(image.store.sid))
+//                .leftJoin(image).on(store.sid.eq(image.store.sid))
+                .leftJoin(preference).on(store.sid.eq(preference.store.sid))
                 .where(expression.get("category"))
                 .where(expression.get("keyword"))
                 .where(expression.get("sector"))
@@ -99,7 +106,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .where(expression.get("storeName"))
                 .where(expression.get("lat"))
                 .where(expression.get("lon"))
-                .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector)
+                .where(store.sid.ne(-1L)) // 매장 아이디 -1 예외 처리
+                .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector, keyword)
                 .select(Projections.fields(StoreShortDTO.class,
                         store.sid.as("id"),
                         store.name.as("storeName"),
@@ -109,20 +117,36 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.lon,
                         store.category,
                         store.sector,
+                        preference.count().as("preferenceCount"),
                         ExpressionUtils.as(subQuery, "mainImage")
-                ));
-        // INFO: 위치 정보로 조건 및 정렬
+                ))
+                .distinct();
+        // INFO: 위치 정보로 조건 및 정렬하여 선택
         if (condition.getLat() != null && condition.getLon() != null) {
             dtoQuery.orderBy(Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
                             store.lat, condition.getLat(), store.lon, condition.getLon())
                     .asc());
         }
+        // Member preference 조회 설정 1 : 나의 관심 매장, 2: 나의 관심 매장 X
+        if (condition.getPreference() != 0L && condition.getMember() != null) {
+            List<Long> myPreferenceStoreIds = from(preference)
+                    .select(preference.store.sid)
+                    .where(preference.member.eq(condition.getMember()))
+                    .fetch();
+            if (condition.getPreference() == 1L) {
+                dtoQuery.where(store.sid.in(myPreferenceStoreIds));
+            } else if (condition.getPreference() == 2L) {
+                dtoQuery.where(store.sid.notIn(myPreferenceStoreIds));
+            }
+        }
         // MEMO: Order 조건 추가 가능
         if (pageable != null) {
-            List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable, store);
+            List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable);
             dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
             // Pagination 처리
-            Objects.requireNonNull(this.getQuerydsl()).applyPagination(pageable, dtoQuery);
+            int page = pageable.getPageNumber();
+            int size = pageable.getPageSize();
+            Objects.requireNonNull(this.getQuerydsl()).applyPagination(PageRequest.of(page, size), dtoQuery);
         } else {
             pageable = PageRequest.of(0, 10);
         }
@@ -130,6 +154,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         List<StoreShortDTO> dtoList = dtoQuery.fetch();
         long count = dtoQuery.fetchCount();
         dtoList.forEach(this::addKeywordList);
+        if (condition.getPreference() == 0 && condition.getMember() != null) {
+            checkMyPreferences(dtoList, condition.getMember());
+        }
         return new PageImpl<>(dtoList, pageable, count);
     }
 
@@ -166,25 +193,21 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         return expressionMap;
     }
 
-    private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable, QStore store) {
+    private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable) {
+        QStore store = QStore.store;
+        QPreference preference = QPreference.preference;
         return pageable.getSort().stream()
                 .map(order -> {
-                    if (order.getProperty().equalsIgnoreCase("sid")) {
-                        return order.isDescending() ? store.sid.desc() : store.sid.asc();
+                    if (order.getProperty().equalsIgnoreCase("preference")) {
+                        return order.isDescending() ? preference.count().desc() : preference.count().asc();
                     } else if (order.getProperty().equalsIgnoreCase("storeName")) {
                         return order.isDescending() ? store.name.desc() : store.name.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("lat")) {
-                        return order.isDescending() ? store.lat.desc() : store.lat.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("lon")) {
-                        return order.isDescending() ? store.lon.desc() : store.lon.asc();
                     } else if (order.getProperty().equalsIgnoreCase("category")) {
                         return order.isDescending() ? store.category.desc() : store.category.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("sector")) {
-                        return order.isDescending() ? store.sector.desc() : store.sector.asc();
                     } else if (order.getProperty().equalsIgnoreCase("updatedAt")) {
                         return order.isDescending() ? store.updatedAt.desc() : store.updatedAt.asc();
                     } else {
-                        throw new IllegalArgumentException("Not Support Sort Method");
+                        return null;
                     }
                 })
                 .filter(Objects::nonNull)
@@ -201,9 +224,20 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .where(keyword.store.sid.eq(storeShortDTO.getId()))
                 .fetch()
                 .stream()
-                .map(Enum::name)
+                .map(KeywordSet::getKorean)
                 .toList();
         storeShortDTO.setKeywords(keywords);
     }
 
+    private void checkMyPreferences(List<StoreShortDTO> storeShortDTOS, Member member) {
+        QPreference preference = QPreference.preference;
+
+        for (StoreShortDTO storeShortDTO : storeShortDTOS) {
+            boolean check = from(preference)
+                    .where(preference.member.eq(member))
+                    .where(preference.store.sid.eq(storeShortDTO.getId()))
+                    .fetchFirst() != null;
+            storeShortDTO.setPreference(check);
+        }
+    }
 }
