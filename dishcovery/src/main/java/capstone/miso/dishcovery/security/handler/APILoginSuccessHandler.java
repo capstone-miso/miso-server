@@ -35,6 +35,8 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
         // Refresh token
         String refreshToken = jwtUtil.generateToken(claim, 30);
 
+        log.info(authentication.getName() + " login success");
+
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("Refresh-Token", refreshToken);
     }
