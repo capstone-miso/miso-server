@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -25,8 +27,9 @@ import java.util.Map;
  **/
 @Log4j2
 @RequiredArgsConstructor
-public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHandler {
+public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JWTUtil jwtUtil;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -42,5 +45,14 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
         response.getWriter().println(authentication.getName() + " Login Success");
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("Refresh-Token", refreshToken);
+        if (response.isCommitted()) {
+            logger.debug("Response has already been committed. Unable to redirect.");
+            return;
+        }
+        String frontPage = UriComponentsBuilder.fromUriString("http://localhost:3000/auth")
+                .queryParam("Authorization",accessToken)
+                .queryParam("Refresh-Token", refreshToken)
+                .build().toUriString();
+        getRedirectStrategy().sendRedirect(request, response, frontPage);
     }
 }
