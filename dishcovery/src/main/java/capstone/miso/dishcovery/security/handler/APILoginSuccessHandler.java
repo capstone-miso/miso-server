@@ -30,11 +30,13 @@ public class APILoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Map<String, Object> claim = Map.of("email", authentication.getName(),
                 "roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
+
         // Access token
         String accessToken = jwtUtil.generateToken(claim, 5);
         // Refresh token
         String refreshToken = jwtUtil.generateToken(claim, 30);
 
+        response.getWriter().println(authentication.getName() + " Login Success");
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("Refresh-Token", refreshToken);
     }

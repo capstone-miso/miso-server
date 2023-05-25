@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class CustomSocialLoginSuccessHandler implements AuthenticationSuccessHan
         // Refresh token
         String refreshToken = jwtUtil.generateToken(claim, 30);
 
+        response.getWriter().println(authentication.getName() + " Login Success");
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("Refresh-Token", refreshToken);
     }

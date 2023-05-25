@@ -22,10 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -76,7 +73,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
-//        QImage image = QImage.image;
         QKeyword keyword = QKeyword.keyword1;
         QPreference preference = QPreference.preference;
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
@@ -97,7 +93,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
 
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
                 .leftJoin(keyword).on(store.sid.eq(keyword.store.sid).and(expression.get("keyword")))
-//                .leftJoin(image).on(store.sid.eq(image.store.sid))
                 .leftJoin(preference).on(store.sid.eq(preference.store.sid))
                 .where(expression.get("category"))
                 .where(expression.get("keyword"))
@@ -219,14 +214,12 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
      */
     private void addKeywordList(StoreShortDTO storeShortDTO) {
         QKeyword keyword = QKeyword.keyword1;
-        List<String> keywords = from(keyword)
+        List<KeywordSet> keywords = from(keyword)
                 .select(keyword.keyword)
                 .where(keyword.store.sid.eq(storeShortDTO.getId()))
-                .fetch()
-                .stream()
-                .map(KeywordSet::getKorean)
-                .toList();
-        storeShortDTO.setKeywords(keywords);
+                .fetch();
+
+        storeShortDTO.setKeywords(keywords.stream().map(KeywordSet::getKorean).toList());
     }
 
     private void checkMyPreferences(List<StoreShortDTO> storeShortDTOS, Member member) {
