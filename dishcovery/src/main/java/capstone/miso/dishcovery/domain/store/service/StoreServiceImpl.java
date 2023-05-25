@@ -4,6 +4,8 @@ import capstone.miso.dishcovery.application.files.repository.FileDataJdbcReposit
 import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
+import capstone.miso.dishcovery.domain.keyword.KeywordSet;
+import capstone.miso.dishcovery.domain.keyword.dao.KeywordGroupDTO;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
@@ -89,14 +91,14 @@ public class StoreServiceImpl implements StoreService {
         ).getImageUrl();
         // 매장 키워드 조회
         List<Keyword> storeKeywords = store.getKeywords();
-        List<String> keywords = storeKeywords.stream().map(keyword -> keyword.getKeyword().toString()).toList();
+        List<KeywordSet> keywords = storeKeywords.stream().map(Keyword::getKeyword).toList();
 
         storeDetailDTO.setOnInfo(onInfo);
         storeDetailDTO.setOffInfo(offInfo);
         storeDetailDTO.setMenus(menus);
         storeDetailDTO.setMainImage(mainImage);
         storeDetailDTO.setImages(images);
-        storeDetailDTO.setKeywords(keywords);
+        storeDetailDTO.setKeywords(new KeywordGroupDTO(keywords));
         storeDetailDTO.setVisitedTime(fileDataJdbcRepository.getStoreTimeTableDTO(sid));
 
         // Keyword Data 추가

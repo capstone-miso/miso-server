@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.domain.store.service;
 
 import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
+import capstone.miso.dishcovery.domain.keyword.dao.KeywordGroupDTO;
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.QPreference;
 import capstone.miso.dishcovery.domain.store.QStore;
@@ -26,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -71,7 +73,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
      *
      * @param condition (매장 ID, 매장명, 카테고리, 키워드, 구역, 위도, 경도, 지도배율)
      * @param pageable
-     * @return
+     * @return 페이징된 가게의 간략한 정보
      */
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
@@ -219,14 +221,11 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
      */
     private void addKeywordList(StoreShortDTO storeShortDTO) {
         QKeyword keyword = QKeyword.keyword1;
-        List<String> keywords = from(keyword)
+        List<KeywordSet> keywords = from(keyword)
                 .select(keyword.keyword)
                 .where(keyword.store.sid.eq(storeShortDTO.getId()))
-                .fetch()
-                .stream()
-                .map(KeywordSet::getKorean)
-                .toList();
-        storeShortDTO.setKeywords(keywords);
+                .fetch();
+        storeShortDTO.setKeywords(new KeywordGroupDTO(keywords));
     }
 
     private void checkMyPreferences(List<StoreShortDTO> storeShortDTOS, Member member) {

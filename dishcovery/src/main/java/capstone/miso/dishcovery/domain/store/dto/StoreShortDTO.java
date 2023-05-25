@@ -5,6 +5,7 @@ package capstone.miso.dishcovery.domain.store.dto;
  * date          : 2023-04-27
  * description   :
  **/
+import capstone.miso.dishcovery.domain.keyword.dao.KeywordGroupDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class StoreShortDTO {
         @Schema(description = "가게 카테고리")
         private String category;
         @Schema(description = "가게 키워드")
-        private List<String> keywords;
+        private KeywordGroupDTO keywords;
         @Schema(description = "또갈집 개수")
         private long preferenceCount;
         @Schema(description = "가게 구역")

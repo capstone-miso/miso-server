@@ -1,5 +1,6 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
+import capstone.miso.dishcovery.domain.keyword.dao.KeywordGroupDTO;
 import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -41,7 +42,7 @@ public class StoreDetailDTO {
     @Schema(description = "매장 종료 타임 정보")
     private List<String> offInfo;
     @Schema(description = "매장 키워드")
-    private List<String> keywords;
+    private KeywordGroupDTO keywords;
     @Schema(description = "매장 이미지")
     private List<String> images;
     @Schema(description = "매장 메뉴 정보")
