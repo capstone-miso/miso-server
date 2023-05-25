@@ -89,7 +89,7 @@ public class StoreServiceImpl implements StoreService {
         ).getImageUrl();
         // 매장 키워드 조회
         List<Keyword> storeKeywords = store.getKeywords();
-        List<String> keywords = storeKeywords.stream().map(keyword -> keyword.getKeyword().toString()).toList();
+        List<String> keywords = storeKeywords.stream().map(keyword -> keyword.getKeyword().getKorean()).toList();
 
         storeDetailDTO.setOnInfo(onInfo);
         storeDetailDTO.setOffInfo(offInfo);

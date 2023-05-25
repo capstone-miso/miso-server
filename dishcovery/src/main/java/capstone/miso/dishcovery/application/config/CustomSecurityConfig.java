@@ -78,6 +78,7 @@ public class CustomSecurityConfig {
         // cors security
         http.cors(httpSecurityCorsConfigurer ->
                 httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource()));
+//        http.cors().disable();
         // oauth2 login
         http.oauth2Login()
                 .successHandler(authenticationSuccessHandler());
