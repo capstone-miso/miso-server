@@ -13,6 +13,7 @@ import static capstone.miso.dishcovery.domain.keyword.KeywordSet.*;
 @Data
 @Builder
 @AllArgsConstructor
+@Deprecated
 public class KeywordGroupDTO {
     private KeywordSetGroupEngDTO eng;
     private KeywordSetGroupKorDTO kor;

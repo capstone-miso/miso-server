@@ -38,10 +38,6 @@ public class PageResponseDTO<T> {
     private String prevPage;
     @Schema(description = "다음 페이지 주소")
     private String nextPage;
-    @Schema(description = "존재하는 키워드 그룹")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @Builder.Default
-    private KeywordGroupDTO keywordGroup = new KeywordGroupDTO();
     @ToString.Exclude
     @JsonIgnore
     private final SimplePageRequestDTO pageRequestDTO;

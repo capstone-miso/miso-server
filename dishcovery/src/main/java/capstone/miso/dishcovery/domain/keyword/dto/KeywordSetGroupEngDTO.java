@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Deprecated
 public class KeywordSetGroupEngDTO {
     private List<String> time;
     private List<String> season;
