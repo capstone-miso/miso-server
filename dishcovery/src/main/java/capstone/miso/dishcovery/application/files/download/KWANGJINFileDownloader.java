@@ -45,21 +45,17 @@ public class KWANGJINFileDownloader {
 
                 String contentType = conn.getContentType();
 
-                if (disposition != null) {
-                    String target = "filename=";
-                    int index = disposition.indexOf(target);
-                    if (index != -1) {
-                        fileName = UUID.randomUUID() + "_" + disposition.substring(index + target.length() + 1);
+                String target = "filename=";
+                int index = disposition.indexOf(target);
+                if (index != -1) {
+                    fileName = UUID.randomUUID() + "_" + disposition.substring(index + target.length() + 1);
 
-                        int dotIndex = fileName.lastIndexOf(".");
-                        if (dotIndex == -1){
-                            throw new IllegalArgumentException("Invalid file name: " + fileName);
-                        }
-
-                        fileFormat = fileName.substring(dotIndex + 1);
+                    int dotIndex = fileName.lastIndexOf(".");
+                    if (dotIndex == -1){
+                        throw new IllegalArgumentException("Invalid file name: " + fileName);
                     }
-                } else {
-                    fileName = UUID.randomUUID().toString() + "_" + LocalDate.now();
+
+                    fileFormat = fileName.substring(dotIndex + 1);
                 }
 
                 InputStream is = conn.getInputStream();

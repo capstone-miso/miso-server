@@ -27,4 +27,5 @@ public interface FileRepository extends JpaRepository<Files, Long> {
     @Query("SELECT f FROM Files f LEFT JOIN FETCH f.fileDataList")
     List<Files> findAllFileAndData();
     boolean existsByDepartmentAndFileUploaded(String department, LocalDate date);
+    boolean existsByFileNameAndFileUploaded(String fileName, LocalDate uploadedDate);
 }

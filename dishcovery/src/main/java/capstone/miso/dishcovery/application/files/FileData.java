@@ -45,9 +45,11 @@ public class FileData extends BaseEntity {
     private String region;
     @ManyToOne(optional = false, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "file_id")
+    @ToString.Exclude
     private Files files;
     @ManyToOne
     @JoinColumn(name = "store_id")
+    @ToString.Exclude
     private Store store;
 
     public void setFiles(Files files) {
@@ -58,8 +60,10 @@ public class FileData extends BaseEntity {
     }
 
     @Builder
-    public FileData(String date, String time, String storeName, String storeAddress, String purpose, String participants, String cost, String paymentOption, String expenditure, Files files, Store store) {
+    public FileData(Long fid, String date, String time, String storeName, String storeAddress, String purpose, String participants, String cost, String paymentOption, String expenditure, String region, Files files, Store store) {
         this.storeName = checkNullOrEmpty(storeName);
+        this.fid = fid;
+        this.region = region;
 
         // 날짜 수정 23 -> 2023 년
         if (date.matches("\\d{2}-\\d{1,2}-\\d{1,2}"))
@@ -81,6 +85,8 @@ public class FileData extends BaseEntity {
                     .appendPattern("[H-m-s]")
                     .appendPattern("[HH-mm]")
                     .appendPattern("[H-m]")
+                    .appendPattern("[H:m]")
+                    .appendPattern("[H:m:s]")
                     .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
                     .toFormatter();
             this.time = LocalTime.parse(time, timeFormatter);
@@ -95,9 +101,17 @@ public class FileData extends BaseEntity {
             throw new IllegalArgumentException("인원수 입력 오류");
         } else {
             this.participants = Integer.parseInt(participants.replaceAll("\\D", ""));
-            if (participants.contains("외")) {
+            if (participants.contains("외") || participants.contains("등")) {
                 this.participants += 1;
             }
+        }
+        // 참여 인원이 500이상이면 파싱 에러로 간주
+        if (this.participants >= 500){
+            throw new IllegalArgumentException("Participants 파싱 에러");
+        }
+        // cost가 1원 단위이면 에러로 간주
+        if (!cost.endsWith("0")){
+            throw new IllegalArgumentException("Cost 원 단위 에러");
         }
         this.cost = Integer.parseInt(cost.replaceAll("\\D", ""));
         if (this.cost < 100) {
