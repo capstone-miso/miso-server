@@ -48,7 +48,7 @@ class PreferenceRepositoryTest {
     public void insertPreferenceDummyData() {
         EasyRandomParameters parameters = new EasyRandomParameters()
                 .dateRange(LocalDate.of(2020, 3, 5), LocalDate.now())
-                .randomize(Integer.class, () -> (int) (Math.random() * 40) + 2) // 2부터 10 사이의 정수 값 생성
+                .randomize(Integer.class, () -> (int) (Math.random() * 70) + 2) // 2부터 10 사이의 정수 값 생성
                 .randomizationDepth(10)
                 .seed(System.currentTimeMillis());
 
@@ -56,8 +56,10 @@ class PreferenceRepositoryTest {
         List<Member> allMembers = memberRepository.findAll();
         List<Store> allStores = storeRepository.findAll();
 
-
         for (Member member : allMembers) {
+            if (member.getEmail().equals("alnico1@naver.com"))
+                continue;
+
             Integer pint = generator.nextObject(Integer.class);
 
             for (int i = 0; i < pint; i++) {

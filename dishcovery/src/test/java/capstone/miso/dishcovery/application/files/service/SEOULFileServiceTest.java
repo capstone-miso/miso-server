@@ -9,19 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 class SEOULFileServiceTest {
     @Autowired
     private SEOULFileService seoulFileService;
-    @Autowired
-    private KakaoFileDataMatchService kakaoFileDataMatchService;
 
-    @Test
-    @DisplayName("Test Convert File to FileData")
-    public void convertFileToFileDataTest() {
-//        seoulFileService.saveFileDataFromFile();
-        kakaoFileDataMatchService.fileDataStoreMatcher(10000L, 100000L);
-    }
     @Test
     @DisplayName("File collector test")
     public void collectFileTest() {
-        seoulFileService.findNowMonthFiles();
+        seoulFileService.findNowMonthFiles(2023, 5);
     }
 
     @Test
