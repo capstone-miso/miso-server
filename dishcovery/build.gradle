@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'capstone.miso'
-version = '0.1.1-SNAPSHOT'
+version = '0.2.0-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {

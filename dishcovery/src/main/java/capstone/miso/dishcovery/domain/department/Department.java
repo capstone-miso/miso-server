@@ -22,6 +22,7 @@ import jakarta.persistence.Entity;
 public class Department {
     @Id
     private String departmentName;
+    private String region;
     private Double lat;
     private Double lon;
 }

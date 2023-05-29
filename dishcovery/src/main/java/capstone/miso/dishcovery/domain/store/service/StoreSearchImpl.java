@@ -43,6 +43,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         super(Store.class);
     }
 
+    @Deprecated
     private static BooleanExpression CAFETERIA_BOOLEAN_EXPRESSION() {
         QStore store = QStore.store;
         BooleanExpression expression = store.category.like(CAFETERIA[0]);
@@ -51,7 +52,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         }
         return expression;
     }
-
+    @Deprecated
     private static BooleanExpression DESSERT_BOOLEAN_EXPRESSION() {
         QStore store = QStore.store;
         BooleanExpression expression = store.category.like(DESSERT[0]);
@@ -169,9 +170,11 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         if (condition.getCategory() != null) {
             String searchCategory = condition.getCategory();
             if (searchCategory.equals("식당")) {
-                expressionMap.put("category", CAFETERIA_BOOLEAN_EXPRESSION());
+//                expressionMap.put("category", CAFETERIA_BOOLEAN_EXPRESSION());
+                expressionMap.put("category", store.categoryKey.eq("음식점"));
             } else if (searchCategory.equals("디저트")) {
-                expressionMap.put("category", DESSERT_BOOLEAN_EXPRESSION());
+//                expressionMap.put("category", DESSERT_BOOLEAN_EXPRESSION());
+                expressionMap.put("category", store.categoryKey.contains("카페"));
             } else {
                 expressionMap.put("category", store.category.contains(searchCategory));
             }
@@ -195,6 +198,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .map(order -> {
                     if (order.getProperty().equalsIgnoreCase("preference")) {
                         return order.isDescending() ? preference.count().desc() : preference.count().asc();
+//                        return null;
                     } else if (order.getProperty().equalsIgnoreCase("storeName")) {
                         return order.isDescending() ? store.name.desc() : store.name.asc();
                     } else if (order.getProperty().equalsIgnoreCase("category")) {

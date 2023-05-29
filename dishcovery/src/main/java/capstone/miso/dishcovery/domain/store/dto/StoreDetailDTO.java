@@ -1,5 +1,6 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
+import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
 import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -32,21 +33,25 @@ public class StoreDetailDTO {
     private String category;
     @Schema(description = "가게 구역")
     private String sector;
-    @Schema(description = "가게 메인 이미지")
-    private String mainImage;
     @Schema(description = "나의 가게 선호 여부")
     private boolean preference;
-    @Schema(description = "매장 오픈 타임 정보")
-    private List<String> onInfo;
-    @Schema(description = "매장 종료 타임 정보")
-    private List<String> offInfo;
+    @Schema(description = "관심 매장 등록 횟수")
+    private long preferenceCount;
+//    @Schema(description = "가게 메인 이미지")
+//    private String mainImage;
+//    @Schema(description = "매장 오픈 타임 정보")
+//    private List<String> onInfo;
+//    @Schema(description = "매장 종료 타임 정보")
+//    private List<String> offInfo;
+//    @Schema(description = "매장 이미지")
+//    private List<String> images;
+//    @Schema(description = "매장 메뉴 정보")
+//    @Builder.Default
+//    private List<MenuDTO> menus = new ArrayList<>();
+    @Schema(description = "카카오 매장 정보")
+    private KakaoStoreDetailDTO storeInfo;
     @Schema(description = "매장 키워드")
     private List<String> keywords;
-    @Schema(description = "매장 이미지")
-    private List<String> images;
-    @Schema(description = "매장 메뉴 정보")
-    @Builder.Default
-    private List<MenuDTO> menus = new ArrayList<>();
     @Schema(description = "매장 방문 시간 정보")
     private StoreTimeTableDTO visitedTime;
     @Schema(description = "매장 키워드 데이터")

@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseEntity {
     @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(updatable = false)
     private LocalDateTime createdAt;
     @LastModifiedDate
-    @Column(nullable = false)
+    @Column()
     private LocalDateTime updatedAt;
 
     @PrePersist

@@ -1,5 +1,8 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
+import capstone.miso.dishcovery.application.files.mapping.KakaoStoreDetailExtractor;
+import capstone.miso.dishcovery.application.files.mapping.detail.KakaoStoreDetail;
 import capstone.miso.dishcovery.application.files.repository.FileDataJdbcRepository;
 import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
@@ -27,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +49,7 @@ public class StoreServiceImpl implements StoreService {
     private final FileDataJdbcRepository fileDataJdbcRepository;
     private final KeywordDataRepository keywordDataRepository;
     private final PreferenceRepository preferenceRepository;
+    private final KakaoStoreDetailExtractor kakaoStoreDetailExtractor;
     private final ModelMapper modelMapper;
 
     @Override
@@ -80,24 +85,14 @@ public class StoreServiceImpl implements StoreService {
                 .sector(store.getSector())
                 .build();
 
-        List<String> onInfo = store.getStoreOnInfos().stream().map(StoreOnInfo::getInfo).toList();
-        List<String> offInfo = store.getStoreOffInfos().stream().map(StoreOffInfo::getInfo).toList();
-        List<MenuDTO> menus = store.getMenus().stream().map(menu -> new MenuDTO(menu.getMid(), menu.getName(), menu.getCost(), menu.getCost(), menu.getMenuImg())).toList();
-        List<String> images = store.getImages().stream().map(Image::getImageUrl).toList();
-        String mainImage = store.getImages().stream().filter(image1 -> image1.getPhotoId().equals("M")).findFirst().orElse(
-                store.getImages().stream().findFirst().orElse(new Image())
-        ).getImageUrl();
         // 매장 키워드 조회
         List<Keyword> storeKeywords = store.getKeywords();
         List<String> keywords = storeKeywords.stream().map(keyword -> keyword.getKeyword().getKorean()).toList();
-
-        storeDetailDTO.setOnInfo(onInfo);
-        storeDetailDTO.setOffInfo(offInfo);
-        storeDetailDTO.setMenus(menus);
-        storeDetailDTO.setMainImage(mainImage);
-        storeDetailDTO.setImages(images);
         storeDetailDTO.setKeywords(keywords);
         storeDetailDTO.setVisitedTime(fileDataJdbcRepository.getStoreTimeTableDTO(sid));
+
+        // 관심 매장 개수
+        storeDetailDTO.setPreferenceCount(preferenceRepository.countByStoreId(sid));
 
         // Keyword Data 추가
         Optional<KeywordData> storeKeywordData = keywordDataRepository.findTopByStore(store);
@@ -112,6 +107,13 @@ public class StoreServiceImpl implements StoreService {
             storeDetailDTO.setPreference(checkMyStorePreference);
         }
 
+        // 매장의 카카오 정보 추가
+        KakaoStoreDetailDTO kakaoStoreDetailDTO;
+        try {
+            kakaoStoreDetailDTO = kakaoStoreDetailExtractor.getKakaoStoreDetailDTO(sid);
+            storeDetailDTO.setStoreInfo(kakaoStoreDetailDTO);
+        } catch (IOException ignored) {
+        }
         return storeDetailDTO;
     }
 

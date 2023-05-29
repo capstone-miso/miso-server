@@ -35,7 +35,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class StoreAndPreferenceService {
-    private final StoreService storeService;
     private final StoreRepository storeRepository;
     private final PreferenceRepository preferenceRepository;
 
@@ -65,10 +64,10 @@ public class StoreAndPreferenceService {
         StoreSearchCondition condition = pageRequestDTO.getStoreSearchCondition();
         condition.setPreference(1L);
         condition.setMember(member);
-        Pageable pageable = pageRequestDTO.getPageable();
+        Pageable pageable = pageRequestDTO.getPageable("updatedAt.desc");
 
         // 나의 관심 매장 조회
-        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, pageable.getPageSize()));
+        Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, pageable);
         storeShortDTOS.forEach(storeShortDTO -> storeShortDTO.setPreference(true));
 
         return PageResponseDTO.<StoreShortDTO>builder()
@@ -100,7 +99,7 @@ public class StoreAndPreferenceService {
         condition.setMember(member);
         Pageable pageable = pageRequestDTO.getPageable();
         // 나의 관심 매장과 유사한 매장 조회
-        Page<Long> storeIds = preferenceRepository.findStoreInMyInterest(member, pageable);
+        Page<Long> storeIds = preferenceRepository.findStoreInMyInterest(member.getEmail(), pageable);
         condition.setStoreIds(storeIds.getContent());
 
         Page<StoreShortDTO> storeShortDTOS = storeRepository.searchAllStoreShort(condition, PageRequest.of(0, pageable.getPageSize()));

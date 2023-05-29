@@ -33,25 +33,35 @@ public class Store extends BaseEntity {
     private Double lon;
     private String address;
     private String category;
+    private String categoryKey;
     private String sector;
     private String phone;
     private int isExtracted;
-    private int totalVisitedCount;
-    private int totalVisited;
-    private int totalCost;
 
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
     private List<Keyword> keywords = new ArrayList<>();
+
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<FileData> fileDataList = new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> images = new ArrayList<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreOffInfo> storeOffInfos = new HashSet<>();
+
+    @Builder.Default
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<StoreOnInfo> storeOnInfos = new HashSet<>();
+
     @OneToOne(mappedBy = "store", cascade = CascadeType.ALL)
     private KeywordData keywordData;
     public void addFileData(FileData fileData){

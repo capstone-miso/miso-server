@@ -34,7 +34,6 @@ public class FileData extends BaseEntity {
     private Long fid;
     private LocalDate date;
     private LocalTime time;
-    @NotBlank
     private String storeName;
     private String storeAddress;
     private String purpose;
@@ -47,7 +46,7 @@ public class FileData extends BaseEntity {
     @JoinColumn(name = "file_id")
     @ToString.Exclude
     private Files files;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "store_id")
     @ToString.Exclude
     private Store store;
@@ -58,11 +57,9 @@ public class FileData extends BaseEntity {
             files.getFileDataList().add(this);
         }
     }
-
     @Builder
-    public FileData(Long fid, String date, String time, String storeName, String storeAddress, String purpose, String participants, String cost, String paymentOption, String expenditure, String region, Files files, Store store) {
+    public FileData(String date, String time, String storeName, String storeAddress, String purpose, String participants, String cost, String paymentOption, String expenditure, String region, Files files, Store store) {
         this.storeName = checkNullOrEmpty(storeName);
-        this.fid = fid;
         this.region = region;
 
         // 날짜 수정 23 -> 2023 년

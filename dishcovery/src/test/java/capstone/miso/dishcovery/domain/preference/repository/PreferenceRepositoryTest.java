@@ -36,7 +36,7 @@ class PreferenceRepositoryTest {
     @DisplayName("Find Similar Preference Store")
     public void findSimilarPreferenceStoreTest() {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<Long> storeInMyInterest = preferenceRepository.findStoreInMyInterest(Member.builder().email("dishcovery@gmail.com").build(),
+        Page<Long> storeInMyInterest = preferenceRepository.findStoreInMyInterest(Member.builder().email("dishcovery@gmail.com").build().getEmail(),
                 pageRequest);
 
         System.out.println(storeInMyInterest);

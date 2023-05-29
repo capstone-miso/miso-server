@@ -2,14 +2,10 @@ package capstone.miso.dishcovery.application.files.repository;
 
 
 import capstone.miso.dishcovery.application.files.FileData;
-import capstone.miso.dishcovery.domain.keyword.KeywordData;
-import capstone.miso.dishcovery.domain.store.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * author        : duckbill413
@@ -18,4 +14,6 @@ import java.util.List;
  **/
 
 public interface FileDataRepository extends JpaRepository<FileData, Long> {
+    Optional<List<FileData>> findAllByStoreIsNull();
+    Optional<List<FileData>> findAllByStoreIsNullAndFidAfterAndFidBefore(Long after, Long before);
 }

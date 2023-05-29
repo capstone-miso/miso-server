@@ -37,7 +37,8 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long> {
             "FROM Preference p " +
             "WHERE p.member NOT LIKE :member " +
             "GROUP BY p.store " +
-            "order by count(p.store.sid) DESC")
+            "order by count(p.store.sid) DESC," +
+            "p.updatedAt DESC ")
     Page<Long> findFamousStores(@Param("member") Member member, Pageable pageable);
 
     @Query("SELECT EXISTS " +
@@ -47,13 +48,61 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long> {
             "GROUP BY p.store)")
     boolean checkMyStorePreference(@Param("member") Member member, @Param("sid") Long sid);
 
-    @Query("SELECT k.store.sid FROM Keyword k " +
-            "WHERE k.keyword IN ( " +
-            "SELECT sk.keyword FROM Keyword sk " +
-            "WHERE sk.store IN (" +
-            "SELECT p.store FROM Preference p " +
-            "WHERE p.member = :member) " +
-            "GROUP BY sk.keyword)" +
-            "GROUP BY k.store")
-    Page<Long> findStoreInMyInterest(@Param("member") Member member, Pageable pageable);
+    @Query("select count(p.store.sid) from Preference p where p.store.sid = :storeId")
+    long countByStoreId(@Param("storeId") Long storeId);
+    @Query(value = """
+            select s.store_id
+            from (select sk.store_id, p2.pid
+                  from store_keyword sk
+                           left join preference p2 on sk.store_id = p2.store_id
+                           left join store s2 on s2.sid = sk.store_id
+                  where sk.keyword in (select tmp.keyword
+                                       from (select ssk.keyword
+                                             from store_keyword ssk
+                                             where ssk.store_id in (select p.store_id
+                                                                    from preference p
+                                                                    where p.member_id = :member
+                                                                    group by p.store_id)
+                                             group by ssk.keyword
+                                             order by ssk.updated_at desc
+                                             limit 3) as tmp)
+                    and s2.category IN (select sc.category
+                                        from (select s.category
+                                              from preference p
+                                                       left join store s on s.sid = p.store_id
+                                              where p.member_id = :member
+                                              order by p.updated_at desc
+                                              limit 10) as sc)
+                  group by sk.store_id, p2.pid) as s
+            group by s.store_id
+            order by count(s.pid) desc
+            """, countQuery = """
+            select count(r.store_id)
+            from (select s.store_id
+                  from (select sk.store_id, p2.pid
+                        from store_keyword sk
+                                 left join preference p2 on sk.store_id = p2.store_id
+                                 left join store s2 on s2.sid = sk.store_id
+                        where sk.keyword in (select tmp.keyword
+                                             from (select ssk.keyword
+                                                   from store_keyword ssk
+                                                   where ssk.store_id in (select p.store_id
+                                                                          from preference p
+                                                                          where p.member_id = :member
+                                                                          group by p.store_id)
+                                                   group by ssk.keyword
+                                                   order by ssk.updated_at desc
+                                                   limit 3) as tmp)
+                          and s2.category IN (select sc.category
+                                              from (select s.category
+                                                    from preference p
+                                                             left join store s on s.sid = p.store_id
+                                                    where p.member_id = :member
+                                                    order by p.updated_at desc
+                                                    limit 10) as sc)
+                        group by sk.store_id, p2.pid) as s
+                  group by s.store_id) r
+            """,
+            nativeQuery = true)
+    Page<Long> findStoreInMyInterest(@Param("member") String member, Pageable pageable);
 }
