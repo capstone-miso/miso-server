@@ -1,17 +1,14 @@
 package capstone.miso.dishcovery.application.files.mapping;
 
-import capstone.miso.dishcovery.application.files.dto.Bus;
 import capstone.miso.dishcovery.application.files.dto.Findway;
-import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
 import capstone.miso.dishcovery.application.files.dto.Menu;
 import capstone.miso.dishcovery.application.files.dto.MenuInfo;
 import capstone.miso.dishcovery.application.files.dto.Photo;
-import capstone.miso.dishcovery.application.files.dto.Subway;
+import capstone.miso.dishcovery.application.files.dto.*;
 import capstone.miso.dishcovery.application.files.mapping.detail.*;
-import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.store.Store;
 import com.google.gson.Gson;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -40,29 +37,28 @@ public class KakaoStoreDetailExtractor {
         return gson.fromJson(json, KakaoStoreDetail.class);
     }
 
-    public List<Image> getStoreAllImages(Store store) throws IOException {
+    public List<Photo> getStoreAllPhotos(Store store) throws IOException {
         KakaoStoreDetail kakaoStoreDetail = getKakaoStoreDetail(store.getSid());
-        if (kakaoStoreDetail.getPhoto() == null){
+        if (kakaoStoreDetail.getPhoto() == null) {
             return null;
         }
         List<PhotoGroup> photoList = kakaoStoreDetail.getPhoto().getPhotoList();
 
-        List<Image> images = new ArrayList<>();
+        List<Photo> photos = new ArrayList<>();
         for (PhotoGroup photoGroup : photoList) {
             for (PhotoUrl photoUrl : photoGroup.getList()) {
                 String imageUrl = photoUrl.getOrgurl();
                 String photoId = photoUrl.getPhotoid();
 
-                Image image = Image.builder().imageUrl(imageUrl).photoId(photoId).store(store).build();
-                images.add(image);
+                photos.add(new Photo(photoId, imageUrl));
             }
         }
-        return images;
+        return photos;
     }
 
     public KakaoStoreDetailDTO getKakaoStoreDetailDTO(Long storeId) throws IOException {
         KakaoStoreDetail kakaoStoreDetail = getKakaoStoreDetail(storeId);
-        String mainphotourl = Optional.ofNullable(kakaoStoreDetail.getBasicInfo().getMainphotourl()).orElse(null);
+        String mainphotourl = kakaoStoreDetail.getBasicInfo().getMainphotourl();
         List<String> openHour = new ArrayList<>();
         List<String> offDays = new ArrayList<>();
         if (kakaoStoreDetail.getBasicInfo().getOpenHour() != null) {
@@ -116,7 +112,17 @@ public class KakaoStoreDetailExtractor {
             menucount = kakaoStoreDetail.getMenuInfo().getMenucount();
             if (kakaoStoreDetail.getMenuInfo().getMenuList() != null) {
                 kakaoStoreDetail.getMenuInfo().getMenuList().forEach(m -> {
-                    menus.add(new Menu(m.getMenu(), m.getPrice()));
+                    String price = m.getPrice();
+                    String menu = m.getMenu();
+                    String description = m.getDesc();
+                    String img = m.getImg();
+
+                    menus.add(Menu.builder()
+                            .price(price)
+                            .menu(menu)
+                            .description(description)
+                            .imgUrl(img)
+                            .build());
                 });
             }
         }

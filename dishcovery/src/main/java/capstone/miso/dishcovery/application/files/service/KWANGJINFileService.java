@@ -70,7 +70,6 @@ public class KWANGJINFileService {
         for (Files f : files) {
             String department = f.getDepartment();
             LocalDate date = f.getFileUploaded();
-
             // 값이 존재하지 않을 경우 추가 (부서명과 날짜로 검색)
             boolean result = fileRepository.existsByDepartmentAndFileUploaded(department, date);
             if (!result){

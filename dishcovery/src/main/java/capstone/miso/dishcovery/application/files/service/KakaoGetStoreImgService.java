@@ -4,67 +4,68 @@ import capstone.miso.dishcovery.application.files.mapping.KakaoStoreDetailExtrac
 import capstone.miso.dishcovery.application.files.mapping.detail.KakaoStoreDetail;
 import capstone.miso.dishcovery.application.files.mapping.detail.PhotoGroup;
 import capstone.miso.dishcovery.application.files.mapping.detail.PhotoUrl;
-import capstone.miso.dishcovery.domain.image.Image;
-import capstone.miso.dishcovery.domain.image.repository.ImageRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class KakaoGetStoreImgService {
     private final KakaoStoreDetailExtractor kakaoStoreDetailExtractor;
     private final StoreRepository storeRepository;
-    private final ImageRepository imageRepository;
-
-    public void saveStoreImages(Store store, int storeCount) throws IOException {
+    public String findStoreMainPhoto(Store store) throws IOException {
         KakaoStoreDetail kakaoStoreDetail = kakaoStoreDetailExtractor.getKakaoStoreDetail(store.getSid());
+        if (kakaoStoreDetail.getPhoto() == null) {
+            return null;
+        }
         List<PhotoGroup> photoList = kakaoStoreDetail.getPhoto().getPhotoList();
-
-        int count = 0;
+        String replacePhoto = null;
         for (PhotoGroup photoGroup : photoList) {
             List<PhotoUrl> photoUrls = photoGroup.getList();
             for (PhotoUrl photoUrl : photoUrls) {
                 String imageUrl = photoUrl.getOrgurl();
                 String photoId = photoUrl.getPhotoid();
 
-                // 이미지가 이미 저장되어 있는 경우 스킵
-                if (imageRepository.existsByImageUrlAndPhotoId(imageUrl, photoId)) {
-                    continue;
+                if (replacePhoto == null){
+                    replacePhoto = imageUrl;
                 }
-
-                Image image = Image.builder()
-                        .imageUrl(imageUrl)
-                        .photoId(photoId)
-                        .store(store)
-                        .build();
-                store.getImages().add(image);
-                count++;
-
-                if (count > storeCount) {
-                    break;
+                if (photoId.equals("M")){
+                    return imageUrl;
                 }
-            }
-            if (count > storeCount) {
-                break;
             }
         }
-        // 이미지 저장 cascade 사용
-        storeRepository.save(store);
+        return replacePhoto;
     }
 
-    public void saveAllStoreImages() {
-        List<Store> stores = storeRepository.findAll();
-        for (Store store : stores) {
-            try {
-                saveStoreImages(store, 5);
-            } catch (Exception ignored) {
+    public void saveStoreMainPhoto(){
+//        List<Store> allStores = storeRepository.findAll();
+        List<Store> allStores = storeRepository.findByMainImageUrlIsNull();
+        log.info("전체 Store 개수: " + allStores.size());
+        int count = 0;
 
+        List<Store> stores = new ArrayList<>();
+        for (Store store : allStores) {
+            if (++count % 1000 == 0){
+                log.info("save store main img count: " + count);
+                storeRepository.saveAll(stores);
+                stores = new ArrayList<>();
+            }
+            try {
+                String mainPhoto = findStoreMainPhoto(store);
+                // 가게의 메인 이미지에 변화가 있을 경우 저장
+                if (!storeRepository.existsBySidAndMainImageUrl(store.getSid(), mainPhoto)){
+                    store.setMainImageUrl(mainPhoto);
+                    stores.add(store);
+                }
+            } catch (IOException ignored) {
             }
         }
+        storeRepository.saveAll(stores);
     }
 }

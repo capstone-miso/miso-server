@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -129,10 +130,14 @@ public class KakaoStoreExtractor {
     public void storeExtraction(List<FileData> fileData) {
         int count = 0;
         int matched = 0;
+
+        List<FileData> saveFileData = new ArrayList<>();
         for (FileData fileDatum : fileData) {
             count++;
             if (count % 1000 == 0) {
-                log.info("FileData to Store Continue... count: " + count + "  matched: " + matched + "now fileDataId: " + fileDatum.getFid());
+                log.info("Matching... count: " + count + "  matched: " + matched + " Now fileDataId: " + fileDatum.getFid());
+                fileDataRepository.saveAll(saveFileData); // 데이터를 1000개 단위로 저장
+                saveFileData = new ArrayList<>();
             }
             try {
                 Store store = findStore(fileDatum);
@@ -140,10 +145,11 @@ public class KakaoStoreExtractor {
                     continue;
                 store.setSector(fileDatum.getRegion());
                 fileDatum.setStore(store);
-                fileDataRepository.save(fileDatum);
+                saveFileData.add(fileDatum);
                 matched++;
             } catch (Exception ignored) {
             }
         }
+        fileDataRepository.saveAll(saveFileData);
     }
 }

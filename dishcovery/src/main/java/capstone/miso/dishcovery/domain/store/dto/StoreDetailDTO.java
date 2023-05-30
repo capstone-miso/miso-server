@@ -1,14 +1,12 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
 import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
-import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -25,6 +23,8 @@ public class StoreDetailDTO {
     private Double lat;
     @Schema(description = "경도")
     private Double lon;
+    @Schema(description = "매장 대표 이미지")
+    private String mainImageUrl;
     @Schema(description = "가게 전화번호")
     private String phone;
     @Schema(description = "가게 주소")
@@ -37,17 +37,6 @@ public class StoreDetailDTO {
     private boolean preference;
     @Schema(description = "관심 매장 등록 횟수")
     private long preferenceCount;
-//    @Schema(description = "가게 메인 이미지")
-//    private String mainImage;
-//    @Schema(description = "매장 오픈 타임 정보")
-//    private List<String> onInfo;
-//    @Schema(description = "매장 종료 타임 정보")
-//    private List<String> offInfo;
-//    @Schema(description = "매장 이미지")
-//    private List<String> images;
-//    @Schema(description = "매장 메뉴 정보")
-//    @Builder.Default
-//    private List<MenuDTO> menus = new ArrayList<>();
     @Schema(description = "카카오 매장 정보")
     private KakaoStoreDetailDTO storeInfo;
     @Schema(description = "매장 키워드")

@@ -2,6 +2,7 @@ package capstone.miso.dishcovery.domain.store.service;
 
 import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
+import capstone.miso.dishcovery.domain.keyword.QKeywordData;
 import capstone.miso.dishcovery.domain.member.Member;
 import capstone.miso.dishcovery.domain.preference.QPreference;
 import capstone.miso.dishcovery.domain.store.QStore;
@@ -34,9 +35,11 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreSearch {
     private final static double KM = 0.0045d;
+    @Deprecated
     private final static String[] CAFETERIA = {"음식점 > 한식%", "음식점 > 일식%", "음식점 > 양식%", "음식점 > 샤브샤브%", "음식점 > 패스트푸드%",
             "음식점 > 중식%", "음식점 > 퓨전요리%", "음식점 > 아시아음식%", "음식점 > 분식%", "음식점 > 패밀리레스토랑%", "음식점 > 기사식당%", "음식점 > 치킨%",
             "음식점 > 도시락%", "음식점 > 뷔페%", "음식점 > 샐러드%"};
+    @Deprecated
     private final static String[] DESSERT = {"음식점 > 간식%", "음식점 > 카페%"};
 
     public StoreSearchImpl() {
@@ -52,6 +55,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         }
         return expression;
     }
+
     @Deprecated
     private static BooleanExpression DESSERT_BOOLEAN_EXPRESSION() {
         QStore store = QStore.store;
@@ -76,25 +80,13 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         QStore store = QStore.store;
         QKeyword keyword = QKeyword.keyword1;
         QPreference preference = QPreference.preference;
+        QKeywordData keywordData = QKeywordData.keywordData;
         Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
-        /*
-          매장 이미지 조회 SQL
-          photoId 가 'M'인 이미지를 최우선으로 하나 조회
-          만일 'M'인 이미지가 없는 경우 가장 처음 이미지 하나만 로드해 온다.
-         */
-        String imageSql = """
-                (SELECT i.imageUrl
-                FROM Image i
-                WHERE i.store.sid = {0}
-                    AND (i.photoId = 'M' OR NOT EXISTS (SELECT ei.imageUrl FROM Image ei WHERE ei.store.sid = {0} AND ei.photoId = 'M'))
-                ORDER BY i.sid ASC
-                LIMIT 1)
-                """;
-        Expression<String> subQuery = Expressions.stringTemplate(imageSql, store.sid);
 
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
                 .leftJoin(keyword).on(store.sid.eq(keyword.store.sid).and(expression.get("keyword")))
                 .leftJoin(preference).on(store.sid.eq(preference.store.sid))
+                .leftJoin(keywordData).on(store.eq(keywordData.store))
                 .where(expression.get("category"))
                 .where(expression.get("keyword"))
                 .where(expression.get("sector"))
@@ -111,17 +103,18 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.phone,
                         store.lat,
                         store.lon,
+                        store.mainImageUrl.as("mainImage"),
                         store.category,
                         store.sector,
-                        preference.count().as("preferenceCount"),
-                        ExpressionUtils.as(subQuery, "mainImage")
+                        preference.count().as("preferenceCount")
                 ))
                 .distinct();
         // INFO: 위치 정보로 조건 및 정렬하여 선택
+        OrderSpecifier<Double> orderByDistance = null;
         if (condition.getLat() != null && condition.getLon() != null) {
-            dtoQuery.orderBy(Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
+            orderByDistance = Expressions.numberTemplate(Double.class, "ABS({0} - {1}) + ABS({2} - {3})",
                             store.lat, condition.getLat(), store.lon, condition.getLon())
-                    .asc());
+                    .asc();
         }
         // Member preference 조회 설정 1 : 나의 관심 매장, 2: 나의 관심 매장 X
         if (condition.getPreference() != 0L && condition.getMember() != null) {
@@ -136,8 +129,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             }
         }
         // MEMO: Order 조건 추가 가능
+        List<OrderSpecifier<?>> orderSpecifiers = null;
         if (pageable != null) {
-            List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(pageable);
+            orderSpecifiers = getOrderSpecifiers(pageable);
             dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
             // Pagination 처리
             int page = pageable.getPageNumber();
@@ -145,6 +139,14 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
             Objects.requireNonNull(this.getQuerydsl()).applyPagination(PageRequest.of(page, size), dtoQuery);
         } else {
             pageable = PageRequest.of(0, 10);
+        }
+        // dtoQuery에 정렬 기준 적용
+        if (orderByDistance != null && orderSpecifiers != null) {
+            orderSpecifiers.add(0, orderByDistance);
+        } else if (orderByDistance != null) {
+            dtoQuery.orderBy(orderByDistance);
+        } else if (orderSpecifiers != null) {
+            dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
         }
 
         List<StoreShortDTO> dtoList = dtoQuery.fetch();
@@ -170,10 +172,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         if (condition.getCategory() != null) {
             String searchCategory = condition.getCategory();
             if (searchCategory.equals("식당")) {
-//                expressionMap.put("category", CAFETERIA_BOOLEAN_EXPRESSION());
                 expressionMap.put("category", store.categoryKey.eq("음식점"));
             } else if (searchCategory.equals("디저트")) {
-//                expressionMap.put("category", DESSERT_BOOLEAN_EXPRESSION());
                 expressionMap.put("category", store.categoryKey.contains("카페"));
             } else {
                 expressionMap.put("category", store.category.contains(searchCategory));
@@ -194,11 +194,15 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     private List<OrderSpecifier<?>> getOrderSpecifiers(Pageable pageable) {
         QStore store = QStore.store;
         QPreference preference = QPreference.preference;
+        QKeywordData keywordData = QKeywordData.keywordData;
         return pageable.getSort().stream()
                 .map(order -> {
                     if (order.getProperty().equalsIgnoreCase("preference")) {
                         return order.isDescending() ? preference.count().desc() : preference.count().asc();
-//                        return null;
+                    } else if (order.getProperty().equalsIgnoreCase("visit")) {
+                        return order.isDescending() ? keywordData.totalVisited.desc() : keywordData.totalVisited.asc();
+                    } else if (order.getProperty().equalsIgnoreCase("cost")) {
+                        return order.isDescending() ? keywordData.totalCost.desc() : keywordData.totalVisited.asc();
                     } else if (order.getProperty().equalsIgnoreCase("storeName")) {
                         return order.isDescending() ? store.name.desc() : store.name.asc();
                     } else if (order.getProperty().equalsIgnoreCase("category")) {

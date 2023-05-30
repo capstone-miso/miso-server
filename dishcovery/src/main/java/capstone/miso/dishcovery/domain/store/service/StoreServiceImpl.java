@@ -2,18 +2,13 @@ package capstone.miso.dishcovery.domain.store.service;
 
 import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
 import capstone.miso.dishcovery.application.files.mapping.KakaoStoreDetailExtractor;
-import capstone.miso.dishcovery.application.files.mapping.detail.KakaoStoreDetail;
 import capstone.miso.dishcovery.application.files.repository.FileDataJdbcRepository;
-import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
 import capstone.miso.dishcovery.domain.member.Member;
-import capstone.miso.dishcovery.domain.menu.dto.MenuDTO;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
-import capstone.miso.dishcovery.domain.store.StoreOffInfo;
-import capstone.miso.dishcovery.domain.store.StoreOnInfo;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreKeywordDataDTO;
 import capstone.miso.dishcovery.domain.store.dto.StoreSearchCondition;
@@ -79,6 +74,7 @@ public class StoreServiceImpl implements StoreService {
                 .storeName(store.getName())
                 .lat(store.getLat())
                 .lon(store.getLon())
+                .mainImageUrl(store.getMainImageUrl())
                 .phone(store.getPhone())
                 .address(store.getAddress())
                 .category(store.getCategory())
@@ -101,8 +97,8 @@ public class StoreServiceImpl implements StoreService {
             storeKeywordDataDTO.init();
             storeDetailDTO.setKeywordData(storeKeywordDataDTO);
         }
+        // storeDetail preference setting
         if (member != null) {
-            // storeDetail preference setting
             boolean checkMyStorePreference = preferenceRepository.checkMyStorePreference(member, sid);
             storeDetailDTO.setPreference(checkMyStorePreference);
         }

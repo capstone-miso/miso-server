@@ -48,7 +48,7 @@ public class GwangjinFileComponent implements OfficialDataComp {
             throw new RuntimeException(e);
         }
         for (long i = 1; i <= totalPage; i++) {
-            List<Files> pageFiles = null;
+            List<Files> pageFiles = new ArrayList<>();
             try {
                 pageFiles = getFileData(i, sdate, edate);
             } catch (IOException e) {
@@ -72,7 +72,6 @@ public class GwangjinFileComponent implements OfficialDataComp {
 
         Connection conn = Jsoup.connect(uri.toString());
         Document document = conn.get();
-
         int totalDocCnt = Integer.parseInt(document.selectXpath("//*[@id=\"content\"]/div[1]/strong").get(0).text());
         return (int) (Math.ceil(totalDocCnt / 10.0));
     }
@@ -90,10 +89,8 @@ public class GwangjinFileComponent implements OfficialDataComp {
         Connection conn = Jsoup.connect(uri.toString());
         Document document = conn.get();
 
-        List<Files> files = extractFileData(document);
-
-//        files.forEach(System.out::println);
-        return files;
+        //        files.forEach(System.out::println);
+        return extractFileData(document);
     }
 
     private static List<Files> extractFileData(Document document) {

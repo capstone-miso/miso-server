@@ -4,6 +4,7 @@ import capstone.miso.dishcovery.domain.BaseEntity;
 import capstone.miso.dishcovery.domain.store.Store;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.beans.Mergeable;
 
 @Getter
 @Setter
@@ -15,9 +16,10 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 public class KeywordData extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long kid;
-    @OneToOne(fetch = FetchType.LAZY)
+    @Column(name = "store_id", nullable = false)
+    private Long storeId;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @MapsId
     @JoinColumn(name = "store_id")
     private Store store;
     private long totalVisited;

@@ -16,4 +16,6 @@ import java.util.List;
  * description   :
  **/
 public interface StoreRepository extends JpaRepository<Store, Long>, StoreSearch {
+    boolean existsBySidAndMainImageUrl(Long storeId, String mainImageUrl);
+    List<Store> findByMainImageUrlIsNull();
 }

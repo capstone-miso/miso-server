@@ -16,6 +16,6 @@ class SEOULFileServiceTest {
     @DisplayName("Test Convert File to FileData")
     public void convertFileToFileDataTest() {
 //        seoulFileService.saveFileDataFromFile();
-        kakaoFileDataMatchService.fileDataStoreMatcher(0L, 100000L);
+        kakaoFileDataMatchService.fileDataStoreMatcher(10000L, 100000L);
     }
 }

@@ -36,8 +36,8 @@ public class FileController {
     @Operation(summary = "파일 변환", description = "저장된 파일을 변환 fail 파라미터 값에 따라 변환 실패 파일도 변환 가능")
     @PostMapping(value = "/convert", produces = "application/json;charset=UTF-8")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void convertFile(@RequestParam boolean fail) {
-        if (fail) {
+    public void convertFile(@RequestParam("status") boolean status) {
+        if (status) {
             KWANGJINFileService.convertFailedFileToFileData();
         } else {
             KWANGJINFileService.convertFileToFileData();

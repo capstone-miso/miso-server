@@ -108,7 +108,6 @@ public class FileDataJdbcRepository {
                        COUNT(CASE WHEN f.cost / f.participants > 25000 THEN 1 END)                                      AS 'cost_over_25000'
                 FROM %s f
                 WHERE f.store_id IS NOT NULL
-                  AND f.store_id != -1
                 GROUP BY f.store_id
                 """, TABLE);
         return namedParameterJdbcTemplate.query(sql, rowMapperFileDataToKeywordData);
@@ -141,7 +140,7 @@ public class FileDataJdbcRepository {
                        COUNT(CASE WHEN f.cost / f.participants > 25000 THEN 1 END)                                      AS 'cost_over_25000'
                 FROM %s f
                 WHERE f.store_id IS NOT NULL
-                  AND f.store_id != -1""", TABLE);
+                """, TABLE);
         List<KeywordManagerDAO> result = namedParameterJdbcTemplate.query(sql, rowMapperFileDataToKeywordManager);
         if (result.size() == 0)
             return null;

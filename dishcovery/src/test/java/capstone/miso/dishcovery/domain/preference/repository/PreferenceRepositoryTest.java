@@ -48,7 +48,7 @@ class PreferenceRepositoryTest {
     public void insertPreferenceDummyData() throws Exception {
         EasyRandomParameters parameters = new EasyRandomParameters()
                 .dateRange(LocalDate.of(2020, 3, 5), LocalDate.now())
-                .randomize(Integer.class, () -> (int) (Math.random() * 9) + 2) // 2부터 10 사이의 정수 값 생성
+                .randomize(Integer.class, () -> (int) (Math.random() * 40) + 2) // 2부터 10 사이의 정수 값 생성
                 .randomizationDepth(10)
                 .seed(System.currentTimeMillis());
 

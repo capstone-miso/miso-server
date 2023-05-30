@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu {
-    private String menu;
     private String price;
+    private String menu;
+    private String description;
+    private String imgUrl;
 }

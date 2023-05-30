@@ -22,5 +22,10 @@ public class Menu {
     @SerializedName("menu")
     @Expose
     private String menu;
-
+    @SerializedName("desc")
+    @Expose
+    private String desc;
+    @SerializedName("img")
+    @Expose
+    private String img;
 }

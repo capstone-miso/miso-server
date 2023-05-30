@@ -8,14 +8,13 @@ package capstone.miso.dishcovery.domain.store;
 
 import capstone.miso.dishcovery.application.files.FileData;
 import capstone.miso.dishcovery.domain.BaseEntity;
-import capstone.miso.dishcovery.domain.image.Image;
 import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
-import capstone.miso.dishcovery.domain.menu.Menu;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +30,8 @@ public class Store extends BaseEntity {
     private String name;
     private Double lat;
     private Double lon;
+    @Column(length = 500)
+    private String mainImageUrl;
     private String address;
     private String category;
     private String categoryKey;
@@ -46,24 +47,6 @@ public class Store extends BaseEntity {
     @Builder.Default
     private List<FileData> fileDataList = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Menu> menus = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<StoreOffInfo> storeOffInfos = new HashSet<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<StoreOnInfo> storeOnInfos = new HashSet<>();
-
-    @OneToOne(mappedBy = "store", cascade = CascadeType.ALL)
-    private KeywordData keywordData;
     public void addFileData(FileData fileData){
         if (fileData == null){
             return;
@@ -72,28 +55,6 @@ public class Store extends BaseEntity {
 
         if (fileData.getStore() != this){
             fileData.setStore(this);
-        }
-    }
-    public void addStoreImg(Image image){
-        if (image == null){
-            return;
-        }
-
-        this.images.add(image);
-
-        if (image.getStore() != this){
-            image.setStore(this);
-        }
-    }
-
-    public void addMenu(Menu menu){
-        if (menu == null){
-            return;
-        }
-
-        this.menus.add(menu);
-        if (menu.getStore() != this){
-            menu.setStore(this);
         }
     }
 }
