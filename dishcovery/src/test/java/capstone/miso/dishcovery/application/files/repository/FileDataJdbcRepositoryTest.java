@@ -1,12 +1,8 @@
 package capstone.miso.dishcovery.application.files.repository;
 
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
-import capstone.miso.dishcovery.domain.keyword.KeywordManager;
 import capstone.miso.dishcovery.domain.keyword.dao.KeywordDataDAO;
-import capstone.miso.dishcovery.domain.keyword.dao.KeywordManagerDAO;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
-import capstone.miso.dishcovery.domain.keyword.repository.KeywordManagerRepository;
-import capstone.miso.dishcovery.domain.keyword.repository.KeywordRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.repository.StoreRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,8 +24,6 @@ class FileDataJdbcRepositoryTest {
     @Autowired
     private KeywordDataRepository keywordDataRepository;
     @Autowired
-    private KeywordManagerRepository keywordManagerRepository;
-    @Autowired
     private StoreRepository storeRepository;
 
     @Test
@@ -39,8 +34,8 @@ class FileDataJdbcRepositoryTest {
         int count = 0;
         List<KeywordData> keywordDataList = new ArrayList<>();
         for (KeywordDataDAO keywordDataDAO : keywordDataDAOS) {
-            if (++count % 1000 == 0){
-                System.out.println("KeywordData extract count: " + count);
+            if (++count % 100 == 0) {
+                System.out.println(LocalDateTime.now() + "    KeywordData extract count: " + count);
                 keywordDataRepository.saveAll(keywordDataList);
                 keywordDataList = new ArrayList<>();
             }
@@ -50,15 +45,6 @@ class FileDataJdbcRepositoryTest {
             keywordDataList.add(keywordData);
         }
         keywordDataRepository.saveAll(keywordDataList);
-    }
-
-    @Test
-    @DisplayName("KeywordData Manager insert test")
-    public void insertKeywordDataManagerTest() {
-        KeywordManagerDAO fileData = fileDataJdbcRepository.getKeywordManagerFromFileData();
-        KeywordManager map = modelMapper.map(fileData, KeywordManager.class);
-
-        keywordManagerRepository.save(map);
     }
 
     @Test
