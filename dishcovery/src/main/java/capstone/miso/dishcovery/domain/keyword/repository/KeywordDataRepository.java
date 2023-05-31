@@ -53,4 +53,5 @@ public interface KeywordDataRepository extends JpaRepository<KeywordData, Long> 
     List<KeywordData> findByOrderByTotalCostDesc(Pageable pageable);
     List<KeywordData> findByOrderByTotalParticipantsDesc(Pageable pageable);
     List<KeywordData> findByOrderByTotalVisitedDesc(Pageable pageable);
+
 }

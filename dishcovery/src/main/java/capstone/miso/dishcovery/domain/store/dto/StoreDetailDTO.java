@@ -1,6 +1,7 @@
 package capstone.miso.dishcovery.domain.store.dto;
 
 import capstone.miso.dishcovery.application.files.dto.KakaoStoreDetailDTO;
+import capstone.miso.dishcovery.domain.parkinglot.dto.ParkingDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,12 +38,12 @@ public class StoreDetailDTO {
     private boolean preference;
     @Schema(description = "관심 매장 등록 횟수")
     private long preferenceCount;
-    @Schema(description = "카카오 매장 정보")
-    private KakaoStoreDetailDTO storeInfo;
     @Schema(description = "매장 키워드")
     private List<String> keywords;
     @Schema(description = "매장 방문 시간 정보")
     private StoreTimeTableDTO visitedTime;
     @Schema(description = "매장 키워드 데이터")
     private StoreKeywordDataDTO keywordData;
+    @Schema(description = "카카오 매장 정보")
+    private KakaoStoreDetailDTO storeInfo;
 }

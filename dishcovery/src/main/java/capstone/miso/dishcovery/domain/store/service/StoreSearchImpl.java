@@ -1,9 +1,12 @@
 package capstone.miso.dishcovery.domain.store.service;
 
+import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordSet;
 import capstone.miso.dishcovery.domain.keyword.QKeyword;
 import capstone.miso.dishcovery.domain.keyword.QKeywordData;
 import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.parkinglot.Parkinglot;
+import capstone.miso.dishcovery.domain.parkinglot.QParkinglot;
 import capstone.miso.dishcovery.domain.preference.QPreference;
 import capstone.miso.dishcovery.domain.store.QStore;
 import capstone.miso.dishcovery.domain.store.Store;
@@ -35,35 +38,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreSearch {
     private final static double KM = 0.0045d;
-    @Deprecated
-    private final static String[] CAFETERIA = {"음식점 > 한식%", "음식점 > 일식%", "음식점 > 양식%", "음식점 > 샤브샤브%", "음식점 > 패스트푸드%",
-            "음식점 > 중식%", "음식점 > 퓨전요리%", "음식점 > 아시아음식%", "음식점 > 분식%", "음식점 > 패밀리레스토랑%", "음식점 > 기사식당%", "음식점 > 치킨%",
-            "음식점 > 도시락%", "음식점 > 뷔페%", "음식점 > 샐러드%"};
-    @Deprecated
-    private final static String[] DESSERT = {"음식점 > 간식%", "음식점 > 카페%"};
-
     public StoreSearchImpl() {
         super(Store.class);
-    }
-
-    @Deprecated
-    private static BooleanExpression CAFETERIA_BOOLEAN_EXPRESSION() {
-        QStore store = QStore.store;
-        BooleanExpression expression = store.category.like(CAFETERIA[0]);
-        for (int i = 1; i < CAFETERIA.length; i++) {
-            expression.or(store.category.like(CAFETERIA[i]));
-        }
-        return expression;
-    }
-
-    @Deprecated
-    private static BooleanExpression DESSERT_BOOLEAN_EXPRESSION() {
-        QStore store = QStore.store;
-        BooleanExpression expression = store.category.like(DESSERT[0]);
-        for (int i = 1; i < DESSERT.length; i++) {
-            expression.or(store.category.like(DESSERT[i]));
-        }
-        return expression;
     }
 
     /**
@@ -78,15 +54,13 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
     @Override
     public Page<StoreShortDTO> searchAllStoreShort(StoreSearchCondition condition, Pageable pageable) {
         QStore store = QStore.store;
-        QKeyword keyword = QKeyword.keyword1;
         QPreference preference = QPreference.preference;
         QKeywordData keywordData = QKeywordData.keywordData;
-        Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store, keyword);
+        Map<String, BooleanExpression> expression = booleanExpressionMap(condition, store);
 
         JPQLQuery<StoreShortDTO> dtoQuery = from(store)
-                .leftJoin(keyword).on(store.sid.eq(keyword.store.sid).and(expression.get("keyword")))
-                .leftJoin(preference).on(store.sid.eq(preference.store.sid))
-                .leftJoin(keywordData).on(store.eq(keywordData.store))
+                .leftJoin(preference).select(preference.store.sid).on(store.sid.eq(preference.store.sid))
+                .leftJoin(keywordData).select(keywordData.totalCost, keywordData.totalVisited).on(store.eq(keywordData.store))
                 .where(expression.get("category"))
                 .where(expression.get("keyword"))
                 .where(expression.get("sector"))
@@ -94,8 +68,7 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .where(expression.get("storeName"))
                 .where(expression.get("lat"))
                 .where(expression.get("lon"))
-                .where(store.sid.ne(-1L)) // 매장 아이디 -1 예외 처리
-                .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector, keyword)
+                .groupBy(store.sid, store.name, store.lat, store.lon, store.category, store.sector)
                 .select(Projections.fields(StoreShortDTO.class,
                         store.sid.as("id"),
                         store.name.as("storeName"),
@@ -105,10 +78,22 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         store.lon,
                         store.mainImageUrl.as("mainImage"),
                         store.category,
+                        store.categoryKey.as("categoryGroup"),
                         store.sector,
-                        preference.count().as("preferenceCount")
+                        preference.count().as("preferenceCount"), // preference 정렬 조건
+                        keywordData.totalVisited.as("totalVisit"), // visit 정렬 조건
+                        keywordData.totalCost.as("totalCost") // cost 정렬 조건
                 ))
                 .distinct();
+        // keyword 에 대하여 검색할 시 사용됨
+        if (condition.getKeyword() != null) {
+            QKeyword keyword = QKeyword.keyword1;
+            List<Store> keywordFind = from(keyword)
+                    .select(keyword.store)
+                    .where(keyword.keyword.stringValue().containsIgnoreCase(condition.getKeyword()))
+                    .fetch();
+            dtoQuery.where(store.in(keywordFind));
+        }
         // INFO: 위치 정보로 조건 및 정렬하여 선택
         OrderSpecifier<Double> orderByDistance = null;
         if (condition.getLat() != null && condition.getLon() != null) {
@@ -140,9 +125,10 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         } else {
             pageable = PageRequest.of(0, 10);
         }
-        // dtoQuery에 정렬 기준 적용
+        // dtoQuery 에 정렬 기준 적용 (거리, 좋아요, 금액, 방문)
         if (orderByDistance != null && orderSpecifiers != null) {
             orderSpecifiers.add(0, orderByDistance);
+            dtoQuery.orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]));
         } else if (orderByDistance != null) {
             dtoQuery.orderBy(orderByDistance);
         } else if (orderSpecifiers != null) {
@@ -158,11 +144,8 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
         return new PageImpl<>(dtoList, pageable, count);
     }
 
-    private Map<String, BooleanExpression> booleanExpressionMap(StoreSearchCondition condition, QStore store, QKeyword keyword) {
+    private Map<String, BooleanExpression> booleanExpressionMap(StoreSearchCondition condition, QStore store) {
         Map<String, BooleanExpression> expressionMap = new HashMap<>();
-        if (condition.getKeyword() != null) {
-            expressionMap.put("keyword", keyword.keyword.stringValue().containsIgnoreCase(condition.getKeyword()));
-        }
         if (condition.getStoreId() != null && condition.getStoreId().size() > 0) {
             expressionMap.put("storeId", store.sid.in(condition.getStoreId()));
         }
@@ -203,11 +186,9 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                         return order.isDescending() ? keywordData.totalVisited.desc() : keywordData.totalVisited.asc();
                     } else if (order.getProperty().equalsIgnoreCase("cost")) {
                         return order.isDescending() ? keywordData.totalCost.desc() : keywordData.totalVisited.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("storeName")) {
-                        return order.isDescending() ? store.name.desc() : store.name.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("category")) {
-                        return order.isDescending() ? store.category.desc() : store.category.asc();
-                    } else if (order.getProperty().equalsIgnoreCase("updatedAt")) {
+                    } else if (order.getProperty().equalsIgnoreCase("name")) {
+                        return order.isDescending() ? store.name.asc() : store.name.desc();
+                    } else if (order.getProperty().equalsIgnoreCase("update")) {
                         return order.isDescending() ? store.updatedAt.desc() : store.updatedAt.asc();
                     } else {
                         return null;
@@ -216,7 +197,6 @@ public class StoreSearchImpl extends QuerydslRepositorySupport implements StoreS
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
-
     /**
      * 매장에 키워드 정보 추가
      */

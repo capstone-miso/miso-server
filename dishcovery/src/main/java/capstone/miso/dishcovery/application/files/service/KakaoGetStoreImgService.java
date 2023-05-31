@@ -48,11 +48,11 @@ public class KakaoGetStoreImgService {
         List<Store> allStores = storeRepository.findByMainImageUrlIsNull();
         log.info("전체 Store 개수: " + allStores.size());
         int count = 0;
-
+        int match = 0;
         List<Store> stores = new ArrayList<>();
         for (Store store : allStores) {
             if (++count % 1000 == 0){
-                log.info("save store main img count: " + count);
+                log.info("save store main img count: " + count + " matched: " + match + " StoreId: " + store.getSid());
                 storeRepository.saveAll(stores);
                 stores = new ArrayList<>();
             }
@@ -62,6 +62,9 @@ public class KakaoGetStoreImgService {
                 if (!storeRepository.existsBySidAndMainImageUrl(store.getSid(), mainPhoto)){
                     store.setMainImageUrl(mainPhoto);
                     stores.add(store);
+                }
+                if (mainPhoto != null){
+                    match++;
                 }
             } catch (IOException ignored) {
             }

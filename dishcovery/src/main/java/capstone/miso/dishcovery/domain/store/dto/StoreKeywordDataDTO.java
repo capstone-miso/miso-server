@@ -1,5 +1,4 @@
 package capstone.miso.dishcovery.domain.store.dto;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,12 +39,9 @@ public class StoreKeywordDataDTO {
     private long costUnder15000;
     private long costUnder25000;
     private long costOver25000;
-    @Schema(description = "전체 금액대 별 방문 수")
+    @Schema(description = "금액대 전체 방문 수")
     private long costDistribution;
-    private long highTotalVisited;
-    private long highTotalCost;
-    private long highTotalParticipants;
-    public void init(){
+    public void initTotal(){
         this.totalSeason = this.spring + this.summer + this.fall + this.winter;
         this.totalMeal = this.breakfast + this.lunch + this.dinner;
         this.totalGroup = this.smallGroup + this.mediumGroup + this.largeGroup + this.extraGroup;

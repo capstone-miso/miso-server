@@ -7,6 +7,8 @@ import capstone.miso.dishcovery.domain.keyword.Keyword;
 import capstone.miso.dishcovery.domain.keyword.KeywordData;
 import capstone.miso.dishcovery.domain.keyword.repository.KeywordDataRepository;
 import capstone.miso.dishcovery.domain.member.Member;
+import capstone.miso.dishcovery.domain.parkinglot.dto.ParkingDTO;
+import capstone.miso.dishcovery.domain.parkinglot.repository.ParkingJDBCRepository;
 import capstone.miso.dishcovery.domain.preference.repository.PreferenceRepository;
 import capstone.miso.dishcovery.domain.store.Store;
 import capstone.miso.dishcovery.domain.store.dto.StoreDetailDTO;
@@ -45,6 +47,7 @@ public class StoreServiceImpl implements StoreService {
     private final KeywordDataRepository keywordDataRepository;
     private final PreferenceRepository preferenceRepository;
     private final KakaoStoreDetailExtractor kakaoStoreDetailExtractor;
+    private final ParkingJDBCRepository parkingJDBCRepository;
     private final ModelMapper modelMapper;
 
     @Override
@@ -90,11 +93,11 @@ public class StoreServiceImpl implements StoreService {
         // 관심 매장 개수
         storeDetailDTO.setPreferenceCount(preferenceRepository.countByStoreId(sid));
 
-        // Keyword Data 추가
+        // Keyword Data 추가 (방문 횟수, 총 이용 금액 등 키워드 데이터)
         Optional<KeywordData> storeKeywordData = keywordDataRepository.findTopByStore(store);
         if (storeKeywordData.isPresent()) {
             StoreKeywordDataDTO storeKeywordDataDTO = modelMapper.map(storeKeywordData.get(), StoreKeywordDataDTO.class);
-            storeKeywordDataDTO.init();
+            storeKeywordDataDTO.initTotal();
             storeDetailDTO.setKeywordData(storeKeywordDataDTO);
         }
         // storeDetail preference setting
@@ -104,11 +107,20 @@ public class StoreServiceImpl implements StoreService {
         }
 
         // 매장의 카카오 정보 추가
-        KakaoStoreDetailDTO kakaoStoreDetailDTO;
+        KakaoStoreDetailDTO kakaoStoreDetailDTO = new KakaoStoreDetailDTO();
         try {
             kakaoStoreDetailDTO = kakaoStoreDetailExtractor.getKakaoStoreDetailDTO(sid);
             storeDetailDTO.setStoreInfo(kakaoStoreDetailDTO);
         } catch (IOException ignored) {
+        }
+
+        // 공영 주차장 정보
+        try {
+            ParkingDTO parkinglot = parkingJDBCRepository.findCloseParkinglot(
+                    storeDetailDTO.getLon(), storeDetailDTO.getLat()
+            );
+            kakaoStoreDetailDTO.getFindway().setParkingZone(parkinglot);
+        } catch (Exception ignored) {
         }
         return storeDetailDTO;
     }
@@ -121,15 +133,20 @@ public class StoreServiceImpl implements StoreService {
         // storeShort 데이터 추가
         // 추천 매장 데이터 출력
         String category = store.getCategory();
-        String[] categorySegments = category.split(" > ");
+        String[] categorySegments = category.split(">");
         List<Long> storeIds = null;
         if (categorySegments.length >= 2) {
-            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, "%" + categorySegments[1] + "%");
+            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[1].trim());
         } else if (categorySegments.length == 1) {
-            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, "%" + categorySegments[0] + "%");
+            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[0].trim());
         }
+        // 해당 매장의 키워드 정보가 없는 경우 카테고리 만으로 비슷한 매장 찾기
         if (storeIds == null || storeIds.size() == 0) {
-            return new ArrayList<>(); // 비슷한 인기 매장이 없는 경우 빈 리스트 리턴
+            storeIds = storeJDBCRepository.findSimilarWithNowStoreOnlyCategory(category.trim());
+        }
+        // 그래도 없는 경우?
+        if (storeIds == null) {
+            return new ArrayList<>();
         }
         storeIds.remove(sid);
         StoreSearchCondition condition = new StoreSearchCondition();

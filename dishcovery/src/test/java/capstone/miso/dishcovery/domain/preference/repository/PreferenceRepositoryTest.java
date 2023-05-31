@@ -45,7 +45,7 @@ class PreferenceRepositoryTest {
     @DisplayName("Preference Dummy Data insert Test")
     @Transactional
     @Rollback(value = false)
-    public void insertPreferenceDummyData() throws Exception {
+    public void insertPreferenceDummyData() {
         EasyRandomParameters parameters = new EasyRandomParameters()
                 .dateRange(LocalDate.of(2020, 3, 5), LocalDate.now())
                 .randomize(Integer.class, () -> (int) (Math.random() * 40) + 2) // 2부터 10 사이의 정수 값 생성
@@ -55,6 +55,7 @@ class PreferenceRepositoryTest {
         EasyRandom generator = new EasyRandom(parameters);
         List<Member> allMembers = memberRepository.findAll();
         List<Store> allStores = storeRepository.findAll();
+
 
         for (Member member : allMembers) {
             Integer pint = generator.nextObject(Integer.class);

@@ -144,7 +144,7 @@ public class KakaoStoreDetailExtractor {
                 .openHour(openHour)
                 .offDays(offDays)
                 .tags(tags)
-                .findway(new Findway(subwayDTO, busDTO))
+                .findway(Findway.builder().bus(busDTO).subway(subwayDTO).build())
                 .menuInfo(new MenuInfo(menucount, menus))
                 .photoList(photos)
                 .build();

@@ -13,6 +13,6 @@ class KakaoFileDataMatchServiceTest {
     @Test
     @DisplayName("FileData Match Service test")
     public void storeExtractionTest() {
-        kakaoFileDataMatchService.fileDataStoreMatcher(854092L, 954092L);
+        kakaoFileDataMatchService.fileDataStoreMatcher(777999L, 820000L);
     }
 }

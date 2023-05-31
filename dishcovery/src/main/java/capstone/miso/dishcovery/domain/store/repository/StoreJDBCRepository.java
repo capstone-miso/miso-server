@@ -1,5 +1,6 @@
 package capstone.miso.dishcovery.domain.store.repository;
 
+import capstone.miso.dishcovery.domain.store.dto.StoreShortDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -14,7 +15,7 @@ public class StoreJDBCRepository {
 
     public List<Long> findSimilarWithNowStore(Long storeId, String category) {
         var sql = """
-                select p.store_id
+                select p.store_id as 'storeId'
                 from preference p
                 where p.store_id in (select s.sid
                                      from store s
@@ -29,7 +30,20 @@ public class StoreJDBCRepository {
                 limit 5
                 """;
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("storeId", storeId)
-                .addValue("category", category);
-        return namedParameterJdbcTemplate.query(sql, params, (rs, rowNum) -> rs.getLong("store_id"));
+                .addValue("category", "%"+category+"%");
+        return namedParameterJdbcTemplate.query(sql, params, (rs, rowNum) -> rs.getLong("storeId"));
+    }
+    public List<Long> findSimilarWithNowStoreOnlyCategory(String category) {
+        var sql = """
+                select s.sid as 'storeId'
+                from store s
+                left join preference p on s.sid = p.store_id
+                where s.category like :category
+                group by s.sid
+                order by count(s.sid) desc
+                limit 5;
+                """;
+        MapSqlParameterSource param = new MapSqlParameterSource().addValue("category", "%"+category+"%");
+        return namedParameterJdbcTemplate.query(sql, param, (rs, rowNum) -> rs.getLong("storeId"));
     }
 }

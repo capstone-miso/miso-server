@@ -33,10 +33,16 @@ public class StoreShortDTO {
         private Double lon;
         @Schema(description = "가게 카테고리")
         private String category;
+        @Schema(description = "가게 카테고리 그룹")
+        private String categoryGroup;
         @Schema(description = "가게 키워드")
         private List<String> keywords;
-        @Schema(description = "또갈집 개수")
+        @Schema(description = "관심 매장 등록 횟수")
         private long preferenceCount;
+        @Schema(description = "방문 횟수")
+        private long totalVisit;
+        @Schema(description = "총 이용 금액")
+        private long totalCost;
         @Schema(description = "가게 구역")
         private String sector;
         @Schema(description = "가게 메인 이미지")

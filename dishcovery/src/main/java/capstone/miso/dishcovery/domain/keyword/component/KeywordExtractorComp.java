@@ -31,10 +31,11 @@ public class KeywordExtractorComp {
 
     public void keywordExtract() {
         List<KeywordData> allKeywordData = keywordDataRepository.findAll();
+        log.info("Selected Keyword Total Count: " + allKeywordData.size());
         int count = 0;
         for (KeywordData keywordData : allKeywordData) {
             if (++count % 1000 == 0){
-                log.info("Keyword extract... count: " + count);
+                log.info("Keyword extract... count: " + count + " StoreId: " + keywordData.getStoreId());
             }
             if (keywordData.getTotalVisited() < 5)
                 continue;
