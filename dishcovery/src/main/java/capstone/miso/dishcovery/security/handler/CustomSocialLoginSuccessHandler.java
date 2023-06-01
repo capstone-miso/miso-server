@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
@@ -28,12 +29,14 @@ import java.util.Map;
 @Log4j2
 @RequiredArgsConstructor
 public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+    @Value("${gong.react.domain}")
+    private String REACT_DOMAIN;
     private final JWTUtil jwtUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
+        log.info("REACT_DOMAIN: " + REACT_DOMAIN);
         Map<String, Object> claim = Map.of("email", authentication.getName(),
                 "roles", authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList());
 
@@ -49,10 +52,14 @@ public class CustomSocialLoginSuccessHandler extends SimpleUrlAuthenticationSucc
             logger.debug("Response has already been committed. Unable to redirect.");
             return;
         }
-        String frontPage = UriComponentsBuilder.fromUriString("http://localhost:3000/auth")
+        String frontPage = UriComponentsBuilder.fromUriString(REACT_DOMAIN)
                 .queryParam("Authorization",accessToken)
                 .queryParam("Refresh-Token", refreshToken)
                 .build().toUriString();
+//        String frontPage = UriComponentsBuilder.fromUriString("http://localhost:3000/auth")
+//                .queryParam("Authorization",accessToken)
+//                .queryParam("Refresh-Token", refreshToken)
+//                .build().toUriString();
         getRedirectStrategy().sendRedirect(request, response, frontPage);
     }
 }

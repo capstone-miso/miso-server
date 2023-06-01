@@ -18,4 +18,15 @@ class SEOULFileServiceTest {
 //        seoulFileService.saveFileDataFromFile();
         kakaoFileDataMatchService.fileDataStoreMatcher(10000L, 100000L);
     }
+    @Test
+    @DisplayName("File collector test")
+    public void collectFileTest() {
+        seoulFileService.findNowMonthFiles();
+    }
+
+    @Test
+    @DisplayName("File to FileData test")
+    public void convertFileToFileData() {
+        seoulFileService.saveFileDataFromFile();
+    }
 }

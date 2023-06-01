@@ -136,13 +136,13 @@ public class StoreServiceImpl implements StoreService {
         String[] categorySegments = category.split(">");
         List<Long> storeIds = null;
         if (categorySegments.length >= 2) {
-            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[1].trim());
+            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[1].trim(), store.getLat(), store.getLon());
         } else if (categorySegments.length == 1) {
-            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[0].trim());
+            storeIds = storeJDBCRepository.findSimilarWithNowStore(sid, categorySegments[0].trim(), store.getLat(), store.getLon());
         }
         // 해당 매장의 키워드 정보가 없는 경우 카테고리 만으로 비슷한 매장 찾기
         if (storeIds == null || storeIds.size() == 0) {
-            storeIds = storeJDBCRepository.findSimilarWithNowStoreOnlyCategory(category.trim());
+            storeIds = storeJDBCRepository.findSimilarWithNowStoreOnlyCategory(category.trim(), store.getLat(), store.getLon());
         }
         // 그래도 없는 경우?
         if (storeIds == null) {

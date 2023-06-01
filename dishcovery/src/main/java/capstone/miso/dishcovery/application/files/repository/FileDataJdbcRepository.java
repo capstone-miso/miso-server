@@ -57,37 +57,51 @@ public class FileDataJdbcRepository {
             .after22(rs.getLong("after22"))
             .build();
 
-    public List<KeywordDataDAO> getAllKeywordDataFromFileData() {
+    public void saveAllKeywordDataFromFileData() {
+        var delete_keyword_data_sql = """
+                delete
+                from keyword_data k
+                where k.store_id >= :storeId
+                """;
+        MapSqlParameterSource deleteParam = new MapSqlParameterSource()
+                .addValue("storeId", 1L);
+        namedParameterJdbcTemplate.update(delete_keyword_data_sql, deleteParam);
         var sql = String.format("""
-                SELECT f.store_id                                                                                       AS 'store_id',
-                       COUNT(f.fid)                                                                                     AS 'total_visited',
-                       SUM(f.cost)                                                                                      AS 'total_cost',
-                       SUM(f.participants)                                                                              AS 'total_participants',
-                       ROUND(SUM(f.cost) / SUM(f.participants), 0)                                                      as cost_per_person,
-                       COUNT(CASE WHEN MONTH(f.date) BETWEEN 3 AND 5 THEN 1 END)                                        AS 'spring',
-                       COUNT(CASE WHEN MONTH(f.date) BETWEEN 6 AND 8 THEN 1 END)                                        AS 'summer',
-                       COUNT(CASE WHEN MONTH(f.date) BETWEEN 9 AND 11 THEN 1 END)                                       AS 'fall',
-                       COUNT(CASE WHEN MONTH(f.date) >= 12 OR MONTH(f.date) <= 2 THEN 1 END)                            AS 'winter',
-                       COUNT(CASE WHEN HOUR(f.time) < 11 THEN 1 END)                                                    AS 'breakfast',
-                       COUNT(CASE WHEN HOUR(f.time) BETWEEN 11 AND 16 THEN 1 END)                                       AS 'lunch',
-                       COUNT(CASE WHEN HOUR(f.time) > 16 THEN 1 END)                                                    AS 'dinner',
-                       COUNT(CASE WHEN f.participants < 5 THEN 1 END)                                                   AS 'small_group',
-                       COUNT(CASE WHEN f.participants BETWEEN 5 AND 10 THEN 1 END)                                      AS 'medium_group',
-                       COUNT(CASE WHEN f.participants BETWEEN 11 AND 20 THEN 1 END)                                     AS 'large_group',
-                       COUNT(CASE WHEN f.participants > 20 THEN 1 END)                                                  AS 'extra_group',
-                       COUNT(CASE WHEN f.cost / f.participants <= 8000 THEN 1 END)                                      AS 'cost_under_8000',
-                       COUNT(CASE
-                                 WHEN f.cost / f.participants > 8000 AND f.cost / f.participants <= 15000
-                                     THEN 1 END)                                                                        AS 'cost_under_15000',
-                       COUNT(CASE
-                                 WHEN f.cost / f.participants > 15000 AND f.cost / f.participants <= 25000
-                                     THEN 1 END)                                                                        AS 'cost_under_25000',
-                       COUNT(CASE WHEN f.cost / f.participants > 25000 THEN 1 END)                                      AS 'cost_over_25000'
-                FROM %s f
-                WHERE f.store_id IS NOT NULL
-                GROUP BY f.store_id
+                INSERT INTO test_seoul.keyword_data (store_id, created_at, updated_at, total_visited, total_cost, total_participants,
+                                                                        cost_per_person, spring, summer, fall, winter, breakfast, lunch, dinner,
+                                                                        small_group, medium_group, large_group, extra_group, cost_under8000,
+                                                                        cost_under15000, cost_under25000, cost_over25000)
+                                       (SELECT f.store_id                                                            AS 'store_id',
+                                               now()                                                                 AS 'created_at',
+                                               now()                                                                 AS 'updated_at',
+                                               COUNT(f.fid)                                                          AS 'total_visited',
+                                               SUM(f.cost)                                                           AS 'total_cost',
+                                               SUM(f.participants)                                                   AS 'total_participants',
+                                               ROUND(SUM(f.cost) / SUM(f.participants), 0)                           AS cost_per_person,
+                                               COUNT(CASE WHEN MONTH(f.date) BETWEEN 3 AND 5 THEN 1 END)             AS 'spring',
+                                               COUNT(CASE WHEN MONTH(f.date) BETWEEN 6 AND 8 THEN 1 END)             AS 'summer',
+                                               COUNT(CASE WHEN MONTH(f.date) BETWEEN 9 AND 11 THEN 1 END)            AS 'fall',
+                                               COUNT(CASE WHEN MONTH(f.date) >= 12 OR MONTH(f.date) <= 2 THEN 1 END) AS 'winter',
+                                               COUNT(CASE WHEN HOUR(f.time) < 11 THEN 1 END)                         AS 'breakfast',
+                                               COUNT(CASE WHEN HOUR(f.time) BETWEEN 11 AND 16 THEN 1 END)            AS 'lunch',
+                                               COUNT(CASE WHEN HOUR(f.time) > 16 THEN 1 END)                         AS 'dinner',
+                                               COUNT(CASE WHEN f.participants < 5 THEN 1 END)                        AS 'small_group',
+                                               COUNT(CASE WHEN f.participants BETWEEN 5 AND 10 THEN 1 END)           AS 'medium_group',
+                                               COUNT(CASE WHEN f.participants BETWEEN 11 AND 20 THEN 1 END)          AS 'large_group',
+                                               COUNT(CASE WHEN f.participants > 20 THEN 1 END)                       AS 'extra_group',
+                                               COUNT(CASE WHEN f.cost / f.participants <= 8000 THEN 1 END)           AS 'cost_under_8000',
+                                               COUNT(CASE
+                                                         WHEN f.cost / f.participants > 8000 AND f.cost / f.participants <= 15000
+                                                             THEN 1 END)                                             AS 'cost_under_15000',
+                                               COUNT(CASE
+                                                         WHEN f.cost / f.participants > 15000 AND f.cost / f.participants <= 25000
+                                                             THEN 1 END)                                             AS 'cost_under_25000',
+                                               COUNT(CASE WHEN f.cost / f.participants > 25000 THEN 1 END)           AS 'cost_over_25000'
+                                        FROM file_data f
+                                        WHERE f.store_id IS NOT NULL
+                                        GROUP BY f.store_id)
                 """, TABLE);
-        return namedParameterJdbcTemplate.query(sql, rowMapperFileDataToKeywordData);
+        namedParameterJdbcTemplate.getJdbcTemplate().update(sql);
     }
 
     public List<KeywordDataDAO> getKeywordDataFromFileData() {

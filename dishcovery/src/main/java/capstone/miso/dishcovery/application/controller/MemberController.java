@@ -5,6 +5,7 @@ import capstone.miso.dishcovery.domain.member.dto.ChangeNicknameRes;
 import capstone.miso.dishcovery.domain.member.exception.MemberValidationException;
 import capstone.miso.dishcovery.domain.member.service.MemberService;
 import capstone.miso.dishcovery.security.dto.MemberSecurityDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +25,7 @@ import java.util.Map;
  * date          : 2023-04-27
  * description   :
  **/
+@Hidden
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor

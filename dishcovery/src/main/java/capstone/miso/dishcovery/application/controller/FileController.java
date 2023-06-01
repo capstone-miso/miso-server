@@ -3,6 +3,7 @@ package capstone.miso.dishcovery.application.controller;
 import capstone.miso.dishcovery.application.files.dto.FileDTO;
 import capstone.miso.dishcovery.application.files.dto.ReqDownloadFile;
 import capstone.miso.dishcovery.application.files.service.KWANGJINFileService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
  * date          : 2023-04-12
  * description   :
  **/
+@Hidden
 @Log4j2
 @RestController
 @RequestMapping("/api/files")

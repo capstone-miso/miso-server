@@ -1,8 +1,6 @@
 package capstone.miso.dishcovery.dto;
 
-import capstone.miso.dishcovery.domain.keyword.dto.KeywordGroupDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

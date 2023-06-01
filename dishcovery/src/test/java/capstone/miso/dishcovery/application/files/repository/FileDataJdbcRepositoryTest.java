@@ -26,24 +26,9 @@ class FileDataJdbcRepositoryTest {
     @Autowired
     private StoreRepository storeRepository;
     @Test
-    @DisplayName("update all KeywordData test")
+    @DisplayName("save all KeywordData test")
     public void updateKeywordDataTest() {
-        List<KeywordDataDAO> keywordDataDAOS = fileDataJdbcRepository.getAllKeywordDataFromFileData();
-        System.out.println("Keyword To Extract Total Count: " + keywordDataDAOS.size());
-        int count = 0;
-        List<KeywordData> keywordDataList = new ArrayList<>();
-        for (KeywordDataDAO keywordDataDAO : keywordDataDAOS) {
-            if (++count % 100 == 0) {
-                System.out.println(LocalDateTime.now() + "    KeywordData extract count: " + count + " store_id: " + keywordDataDAO.getStoreId());
-                keywordDataRepository.saveAll(keywordDataList);
-                keywordDataList = new ArrayList<>();
-            }
-            KeywordData keywordData = modelMapper.map(keywordDataDAO, KeywordData.class);
-            Store store = storeRepository.findById(keywordData.getStoreId()).orElseThrow();
-            keywordData.setStore(store);
-            keywordDataList.add(keywordData);
-        }
-        keywordDataRepository.saveAll(keywordDataList);
+        fileDataJdbcRepository.saveAllKeywordDataFromFileData();
     }
 
     @Test
