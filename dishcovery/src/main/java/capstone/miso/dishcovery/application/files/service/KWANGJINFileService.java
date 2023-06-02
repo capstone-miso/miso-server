@@ -79,7 +79,7 @@ public class KWANGJINFileService {
     }
     @Transactional
     public void convertFileToFileData() {
-        Optional<List<Files>> result = fileRepository.findNotConvertedWithFileData();
+        Optional<List<Files>> result = fileRepository.findNotConvertedWithFileData("광진구");
         List<Files> files = result.orElse(null);
 
         if (Objects.isNull(files)) {

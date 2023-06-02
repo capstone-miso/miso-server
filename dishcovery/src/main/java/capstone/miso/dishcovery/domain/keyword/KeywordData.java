@@ -22,23 +22,42 @@ public class KeywordData extends BaseEntity {
     @MapsId
     @JoinColumn(name = "store_id")
     private Store store;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long totalVisited;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long totalCost;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long totalParticipants;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long costPerPerson;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long spring;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long summer;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long fall;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long winter;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long breakfast;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long lunch;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long dinner;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long smallGroup;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long mediumGroup;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long largeGroup;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long extraGroup;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long costUnder8000;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long costUnder15000;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long costUnder25000;
+    @Column(columnDefinition = "INTEGER DEFAULT 0")
     private long costOver25000;
 }

@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Log4j2
 @Component
@@ -61,7 +62,16 @@ public class ParkinglotCollector {
             parkinglotList.add(parkinglot);
         }
         System.out.println("save size: " + parkinglotList.size());
-        parkinglotRepository.saveAll(parkinglotList);
+        int count = 0;
+        for (Parkinglot parkinglot : parkinglotList) {
+            Optional<Parkinglot> byId = parkinglotRepository.findById(parkinglot.getParkingCode());
+            if (byId.isPresent()){
+                count++;
+            } else {
+                parkinglotRepository.save(parkinglot);
+            }
+        }
+        log.info("duplicated count: " + count);
 
         long pageSize = page * 500;
         if (pageSize < totalCount){

@@ -15,5 +15,5 @@ import java.util.Optional;
 
 public interface FileDataRepository extends JpaRepository<FileData, Long> {
     Optional<List<FileData>> findAllByStoreIsNull();
-    Optional<List<FileData>> findAllByStoreIsNullAndFidBetween(Long after, Long before);
+    Optional<List<FileData>> findAllByStoreIsNullAndFidBetweenOrderByFidDesc(Long after, Long before);
 }

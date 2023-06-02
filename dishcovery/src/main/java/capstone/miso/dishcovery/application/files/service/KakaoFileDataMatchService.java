@@ -19,7 +19,7 @@ public class KakaoFileDataMatchService {
     private final StoreRepository storeRepository;
     public void fileDataStoreMatcher(long after, long before){
 //        Optional<List<FileData>> allByStoreIsNull = fileDataRepository.findAllByStoreIsNull();
-        Optional<List<FileData>> allByStoreIsNull = fileDataRepository.findAllByStoreIsNullAndFidBetween(after, before);
+        Optional<List<FileData>> allByStoreIsNull = fileDataRepository.findAllByStoreIsNullAndFidBetweenOrderByFidDesc(after, before);
 
         List<FileData> fileData = allByStoreIsNull.orElse(null);
         assert fileData != null;

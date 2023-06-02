@@ -23,11 +23,7 @@ public class SEOULFileService {
     private final SeoulOfficerFileDataComp fileDataComp;
     private final FileRepository fileRepository;
 
-    public List<Files> findNowMonthFiles() {
-        LocalDate now = LocalDate.now();
-        int year = now.getYear();
-        int month = now.getMonthValue();
-
+    public List<Files> findNowMonthFiles(int year, int month) {
         List<Files> files = fileComp.findFiles(year, month);
 
         files.forEach(file -> {
@@ -57,7 +53,7 @@ public class SEOULFileService {
     }
 
     public void saveFileDataFromFile() {
-        Optional<List<Files>> result = fileRepository.findNotConvertedWithFileData();
+        Optional<List<Files>> result = fileRepository.findNotConvertedWithFileData("서울");
         List<Files> files = result.orElse(null);
 
         if (files == null || files.size() == 0) {

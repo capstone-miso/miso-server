@@ -45,7 +45,7 @@ public class KakaoGetStoreImgService {
 
     public void saveStoreMainPhoto(){
 //        List<Store> allStores = storeRepository.findAll();
-        List<Store> allStores = storeRepository.findByMainImageUrlIsNull();
+        List<Store> allStores = storeRepository.findByMainImageUrlIsNullOrderBySidDesc();
         log.info("전체 Store 개수: " + allStores.size());
         int count = 0;
         int match = 0;
