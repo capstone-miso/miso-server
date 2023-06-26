@@ -38,23 +38,6 @@ SNS, 포털 사이트 검색을 통한 맛집들은 광고 기반인 경우가 �
     1. Chakra UI (애플리케이션 개발)
     2. Axios (비동기 통신을 통한 서버 연동)
 
-## 나의 작업 내용
-
-1. Spring Server 구성
-    - Spring Security 구현 및 권한 설계
-    - OAuth2를 사용하여 카카오 로그인 구현
-    - JWT를 사용한 Access, Refresh 토콘 기반 로그인 구현
-    - 매장 리스트 및 매장 상세 정보 등 CRUD 설계
-2. RDBMS Database 설계
-    - MySQL 사용
-    - 쿼리 요청을 위하여 Spring JPA 및 JDBC 사용
-    - Querydsl을 활용하여 동적 쿼리 사용
-3. 공무원 업무추진비 내역 데이터 수집 및 수집 자동화
-    - Jsoup 활용하여 데이터 파싱
-    - Spring batch를 사용하여 데이터 수집 자동화
-4. 서비스 배포
-    - AWS를 활용하여 Spring 서버 및 React 서버 서비스 배포
-
 ## 화면 구성
 <div>
   <div>
