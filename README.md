@@ -1,13 +1,14 @@
 # Dishcovery
 
 공무원 업무추진비 내역을 기반으로 한 로컬 맛집 추천 서비스
+- 2023년 제 15회 창의설계경진대회 우수상
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/f3deca72-37b1-4331-95ab-f121083bc348" height="400px">
 
 ### 접속 도메인
-
-[https://dishcovery.life](https://dishcovery.life)
-
+[https://dishcovery.life](https://dishcovery.life)  
 본 서비스는 Mobile 환경에 최적화 되어 있습니다.
 
+---
 ## 기획 배경
 
 1. 기존의 맛집 추천 및 검색 방식의 신뢰 문제
@@ -37,6 +38,19 @@ SNS, 포털 사이트 검색을 통한 맛집들은 광고 기반인 경우가 �
 6. React (웹페이지 구성)
     1. Chakra UI (애플리케이션 개발)
     2. Axios (비동기 통신을 통한 서버 연동)
+
+## 시퀸스 다이어그램
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/4c8edcba-66bb-49db-9882-729210e82b83" width="600px">
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/ea217ca4-0057-400c-ac53-4e4101d39e7f" width="600px">
+
+## 서비스 아키텍처
+- Client
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/42cdc524-ae58-4e4c-a89d-a34d65ff98d9" width="600px">
+- Server
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/5acd141b-cd94-43de-a8a5-ef918314a9f3" width="600px">
+
+## ERD 설계
+<img src="https://github.com/capstone-miso/miso-server/assets/86183856/01c3cb97-e3f8-4e97-8557-c67eda68ac29" width="600px"/>
 
 ## 화면 구성
 <div>
