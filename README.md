@@ -5,7 +5,7 @@
 <img src="https://github.com/capstone-miso/miso-server/assets/86183856/f3deca72-37b1-4331-95ab-f121083bc348" height="400px">
 
 ### 접속 도메인
-[https://dishcovery.life](https://dishcovery.life)  
+~~[https://dishcovery.life](https://dishcovery.life)~~  
 본 서비스는 Mobile 환경에 최적화 되어 있습니다.
 
 ---
